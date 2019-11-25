@@ -1,0 +1,107 @@
+<ion-header>
+        <ion-toolbar color="primary">
+            <ion-buttons slot="start">
+                <ion-back-button></ion-back-button>
+            </ion-buttons>
+            <ion-title>
+                Reshudle Your Time slot
+            </ion-title>
+        </ion-toolbar>
+    </ion-header>
+    
+    <ion-content>
+        <ion-list>
+            <ion-item *ngIf="vendor">
+                <ion-label>Time Required For Selected Service <br /> {{totalSlotsRequired * vendor.slotDuration}} hrs
+                    ({{totalSlotsRequired}} slots) already booked slot</ion-label>
+            </ion-item>
+        </ion-list>
+    
+        <ion-list>
+            <ion-item>
+                <ion-label>Date</ion-label>
+                <ion-datetime [value]="selectedData" (ionChange)="dateChange($event)" placeholder="Select Date">
+                </ion-datetime>
+            </ion-item>
+            <!-- <ion-item>
+                            <ion-label>Time</ion-label>
+                            <ion-datetime minuteValues="0,30" display-format="h:mm A" picker-format="h:mm A" value="1990-02-19T07:00Z"></ion-datetime>
+                          </ion-item> -->
+        </ion-list>
+    
+        <div style="padding: 15px;">
+            <h3>Slots</h3>
+            <div *ngIf="availableSlotsToday.length >0">
+                <ion-grid>
+                    <ion-row>
+                        <ion-col size="12">
+                            <p
+                                style="height: 15px;width:15px;border-radius: 3px;background:rgb(224, 181, 0);;float: left;margin: 0px;">
+                            </p>
+                            <p style="margin: 0px;padding-left:5px;float: left;">Extends To Tomorrow</p>
+                        </ion-col>
+                        <ion-col size="12">
+                            <p
+                                style="height: 15px;width:15px;border-radius: 3px;background:#10dc60;float: left;margin: 0px;">
+                            </p>
+                            <p style="margin: 0px;padding-left:5px;float: left;">Same Day Delivery</p>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+    
+                <ion-grid>
+                    <ion-row>
+                        <ion-col size="6" *ngFor="let aslot of availableSlotsToday">
+                            <ion-chip (click)="slotSelectionChange(aslot)" [outline]="!aslot.isSelected"
+                                [color]="aslot.isExtended ? 'warning':'success'" style="width: 80%;margin: auto;">
+                                <ion-label style="margin: auto;">{{aslot.time}}</ion-label>
+                            </ion-chip>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+            </div>
+    
+    
+    
+    
+    
+    
+    
+            <!-- <p *ngFor="let aslot of availableSlots">
+            
+                        Slot <strong>{{aslot.slot}}</strong> Available at <strong>{{aslot.bay}}</strong> ({{aslot.time}}) <br/>
+                        <span *ngIf="aslot.isExtended" style="font-size: 12px;">(This slots extends to next day)</span>
+            
+                    </p> -->
+    
+    
+    
+    
+            <p *ngIf="availableSlotsToday.length <= 0">
+                No Slots available for selected date.
+            </p>
+        </div>
+    
+    </ion-content>
+    <ion-footer>
+        <ion-toolbar>
+    
+            <ion-grid>
+                <ion-row>
+                    <ion-col size="6">
+                        <ion-item lines="none">
+                            <ion-label>
+                                <p>Subtotal</p>
+                                <h1>${{grandTotal}}</h1>
+                            </ion-label>
+                        </ion-item>
+    
+                    </ion-col>
+                    <ion-col (click)="proceedClick()" size="6">
+                        <ion-button color="primary" expand="block" fill="outline">Reschdule</ion-button>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+    
+        </ion-toolbar>
+    </ion-footer>

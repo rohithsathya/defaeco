@@ -1,0 +1,101 @@
+<ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>My Account</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    
+    <ion-content>
+  
+      <div style="background-color: whitesmoke;height:100%;width:100%;overflow: auto">
+        <div style="margin:16px">
+          <ion-item>
+            <ion-avatar slot="start">
+              <img [src]="userProfile.photoURL">
+            </ion-avatar>
+        
+            <ion-label style="margin: 24px 0px">
+              <h2>{{userProfile.displayName}}</h2>
+              <p>+91-{{userProfile.phoneNumber}}</p>
+        
+            </ion-label>
+        
+            <ion-thumbnail slot="end" class="ion-activatable">
+              <ion-icon style="font-size:30px;margin-top: 12px" (click)="navigateToEditProfile()" name="create" color="primary"></ion-icon>
+              <ion-ripple-effect></ion-ripple-effect>
+            </ion-thumbnail>
+          </ion-item>
+        </div>
+  
+        <div style="margin:8px 16px">
+            <ion-item>
+              <ion-thumbnail slot="start">
+                <ion-icon style="font-size:20px;margin-top: 12px;color:#747474" name="mail"></ion-icon>
+              </ion-thumbnail>
+              <ion-label>
+                <p>Email Id</p>
+                <h3 *ngIf="user.email">{{userProfile.email}}</h3>
+                <h3 *ngIf="!user.email">Not Provided</h3>
+              </ion-label>
+            </ion-item>
+          </div>
+          <div style="margin:8px 16px">
+              <ion-item>
+                <ion-thumbnail slot="start">
+                  <ion-icon style="font-size:20px;margin-top: 12px;color:#747474" name="phone-portrait"></ion-icon>
+                </ion-thumbnail>
+                <ion-label>
+                  <p>Mobile
+                      <ion-icon color="success" name="star"></ion-icon>
+                  </p>
+                  <h3>+91-{{userProfile.phoneNumber}}</h3>
+                </ion-label>
+              </ion-item>
+            </div>
+  
+          <div style="margin:8px 16px">
+              <ion-item>
+                <ion-thumbnail slot="start">
+                  <ion-icon style="font-size:20px;margin-top: 12px;color:#747474" name="calendar"></ion-icon>
+                </ion-thumbnail>
+                <ion-label>
+                  <p>Vehicle Number</p>
+                  <h3>{{userProfile.regNo}}</h3>
+                </ion-label>
+              </ion-item>
+            </div>
+
+            <div style="margin:8px 16px">
+                <ion-item>
+                  <ion-thumbnail slot="start">
+                    <ion-icon style="font-size:20px;margin-top: 12px;color:#747474" name="calendar"></ion-icon>
+                  </ion-thumbnail>
+                  <ion-label>
+                    <p>Vehicle Type</p>
+                    <h3>{{userProfile.vehicleType}}</h3>
+                  </ion-label>
+                </ion-item>
+              </div>
+  
+            <div style="margin:8px 16px">
+                <ion-item>
+                  <ion-thumbnail slot="start">
+                    <ion-icon style="font-size:20px;margin-top: 12px;color:#747474" name="pin"></ion-icon>
+                  </ion-thumbnail>
+                  <ion-label>
+                    <p>Address</p>
+                    <h3>
+                      {{userProfile.addressLine1}}<br/>
+                      {{userProfile.addressLine2}}<br/>
+                      {{userProfile.addressLine3}} <br/>
+                      {{userProfile.addressLine4}}
+                    </h3>
+                  </ion-label>
+                </ion-item>
+              </div>
+       
+              <div style="margin:36px 16px 16px 16px">
+                  <ion-button style="background-color: white;width: 60%;margin:auto" expand="block" fill="outline" color="danger" (click)="signOutClick()">Sign out</ion-button>
+              </div>
+      </div>
+  
+    </ion-content>

@@ -1,0 +1,125 @@
+<ion-header *ngIf="vendor">
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-back-button></ion-back-button>
+        </ion-buttons>
+        <ion-title>
+            {{vendor.name}}
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="vendor">
+
+    <ion-slides pager="true" [options]="slideOpts">
+        <ion-slide>
+            <div>
+                <img src="assets/img/banner1.jpg" style="max-height: 200px;width:100%" />
+            </div>
+
+        </ion-slide>
+
+        <ion-slide>
+            <div>
+                <img src="assets/img/banner2.jpg" style="max-height: 200px;width:100%" />
+            </div>
+        </ion-slide>
+
+        <ion-slide>
+            <div>
+                <img src="assets/img/banner3.jpg" style="max-height: 200px;width:100%" />
+            </div>
+        </ion-slide>
+    </ion-slides>
+
+    <ion-list>
+        <ion-item lines="none">
+            <h3>{{vendor.name}}</h3>
+            <ion-chip slot="end" outline="true" color="success">
+                <ion-label>{{vendor.rating}}</ion-label>
+                <ion-icon name="star"></ion-icon>
+            </ion-chip>
+        </ion-item>
+
+        <ion-item lines="none">
+            <ion-label>
+                <p>{{vendor.address}}</p>
+            </ion-label>
+            <ion-button slot="end">
+                Open Maps
+            </ion-button>
+        </ion-item>
+
+        <ion-item lines="none">
+            <ion-label>
+                <p>Service Hours</p>
+            </ion-label>
+
+            <ion-label slot="end">
+                <p style="float:right">{{parseDefaecTimeToTime(vendor.shopOpenTime)}} -
+                    {{parseDefaecTimeToTime(vendor.shopCloseTime)}}</p>
+            </ion-label>
+
+        </ion-item>
+
+        <ion-item lines="none">
+            <ion-label>
+                <p>Services Offered</p>
+            </ion-label>
+        </ion-item>
+        <div style="margin:8px 16px;box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);">
+            <ion-list>
+                <ion-item>
+                    <ion-label>Car Wash</ion-label>
+                </ion-item>
+                <ion-item>
+                    <ion-label>Car Detailing</ion-label>
+                </ion-item>
+                <ion-item>
+                    <ion-label>Paint Protections</ion-label>
+                </ion-item>
+            </ion-list>
+        </div>
+
+        <ion-item lines="none">
+            <ion-label>
+                <p>Amenities</p>
+            </ion-label>
+        </ion-item>
+
+        <ion-item lines="none">
+
+            <p>
+                <ion-chip outline color="tertiary">
+                    <ion-label>Wi-Fi</ion-label>
+                </ion-chip>
+                <ion-chip outline color="tertiary">
+                    <ion-label>Cafe</ion-label>
+                </ion-chip>
+                <ion-chip outline color="tertiary">
+                    <ion-label>Kids Play Area</ion-label>
+                </ion-chip>
+
+                <ion-chip outline color="tertiary">
+                    <ion-label>Pick Up & Drop</ion-label>
+                </ion-chip>
+                <ion-chip outline color="tertiary">
+                    <ion-label>Power Backup</ion-label>
+                </ion-chip>
+            </p>
+        </ion-item>
+    </ion-list>
+</ion-content>
+<ion-footer>
+    <ion-toolbar>
+
+        <ion-grid>
+            <ion-row>
+                <ion-col (click)="bookServiceClick()" size="6" offset="3">
+                    <ion-button color="primary" expand="block" fill="outline">Book</ion-button>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+
+    </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,24 @@
+
+  .profile-pic-container{
+    width: 120px;
+    height: 120px;
+    background: lightslategray;
+    text-align: center;
+    margin: auto;
+    border-radius: 50%;
+    color: whitesmoke;
+  }
+  .profile-pic-icon-holder{
+    margin-top: 70px;
+    margin-left: 70px;
+    color: white;
+    background: #3880ff;
+    height: 40px;
+    width: 40px;
+    font-size: 20px;
+    border-radius: 50%;
+    line-height: 40px;
+  }
+  .profile-pic-icon-holder > ion-icon{
+    margin-top:10px;
+  }

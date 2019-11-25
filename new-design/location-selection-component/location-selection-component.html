@@ -1,0 +1,43 @@
+<ion-content>
+
+    <ion-item>
+        <ion-label>
+            Choose your location
+        </ion-label>
+    </ion-item>
+
+    <ion-item>
+        <ion-label>City</ion-label>
+        <ion-select>
+            <ion-select-option value="BLR">Bangalore</ion-select-option>
+        </ion-select>
+    </ion-item>
+
+    <ion-item>
+        <ion-label>Locality</ion-label>
+        <ion-select>
+            <ion-select-option value="560100">E city</ion-select-option>
+            <ion-select-option value="560098">R R Nagara</ion-select-option>
+            <ion-select-option value="560065">Vijay Nagara</ion-select-option>
+
+        </ion-select>
+    </ion-item>
+
+    <ion-item>
+        <ion-label style="text-align: center">
+            OR
+        </ion-label>
+    </ion-item>
+
+    <ion-item>
+        <ion-label position="stacked">Area Pincode</ion-label>
+        <ion-input required type="number"></ion-input>
+    </ion-item>
+
+    <div class="ion-padding">
+        <ion-button expand="block" type="submit" class="ion-no-margin" (click)="closePopover()">Validate</ion-button>
+    </div>
+
+
+
+</ion-content>

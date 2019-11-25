@@ -1,0 +1,134 @@
+<ion-header>
+        <ion-toolbar color="primary">
+
+            <ion-buttons slot="start">
+                <ion-button (click)="navigateToBookingsPage()">
+                  <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+                </ion-button>
+            </ion-buttons>
+          <ion-title>Booking Details</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      
+      <ion-content *ngIf="order">
+      
+        <div style="background: whitesmoke;height: 100%;overflow: auto">
+          <div
+            style="display: flex;background: white;padding: 16px;margin:8px;box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);">
+            <div style="padding:10px 20px 10px 10px">
+              <ion-avatar>
+                <img src="assets/img/homePageBanner3.jpg">
+              </ion-avatar>
+            </div>
+            <div style="flex:1">
+              <ion-label>
+                <h2 style="margin-bottom: 8px">{{order.ui.packageName}} </h2>
+                <h3 style="margin-bottom: 8px">{{order.ui.vendorName}}</h3>
+                <h4 style="margin-bottom: 8px">SUV</h4>
+                <div style="margin-bottom: 8px">
+                  <ion-chip outline [color]="orderStausColor" style="margin:0px">
+                    <ion-label>{{orderStatusLable}}</ion-label>
+                  </ion-chip>
+                </div>
+
+
+
+
+                <div style="margin-bottom: 16px;overflow: auto">
+                  <div style="width: 50%;float:left">
+                    <p>Schedule Pick Up</p>
+                    <p>{{order.slot.date}} <br/> {{order.slot.time}}</p>
+                  </div>
+                  <div style="width: 50%;float:left">
+                    <p>Schedule Drop</p>
+                    <p> 
+                      <span *ngIf="!order.slot.isExtended">{{order.slot.deliveryDate}}</span> 
+                      <span *ngIf="order.slot.isExtended">{{order.slot.deliveryDate}}</span>
+                      <br/> {{order.slot.deliveryTime}}
+                    </p>
+                  </div>
+                </div>
+                <div style="margin-bottom: 16px;overflow: auto">
+                    <div style="width: 80%;float:left">
+                        <p>Price</p>
+                        <p>Rs {{order.totalPrice}}</p>
+                      </div>
+                </div>
+
+
+
+      
+                <div style="margin-bottom: 8px">
+                  <div style="width: 50%;float:left" *ngIf="isOrderActive">
+                    <ion-button expand="block" fill="outline" color="danger" (click)="cancelOrder(order.id)">Cancel</ion-button>
+                  </div>
+                  <div style="width: 50%;float:left" *ngIf="isOrderActive">
+                    <ion-button expand="block" fill="outline" color="primary" (click)="reScheduleSlotForOrder(order.id)">Reschdule</ion-button>
+                  </div>
+                  <div style="width: 50%;float:left" *ngIf="!isOrderActive">
+                      <ion-button expand="block" fill="outline" color="primary">Feedback</ion-button>
+                    </div>
+                </div>
+      
+      
+              </ion-label>
+      
+      
+            </div>
+          </div>
+      
+          <div style="margin:8px">
+      
+            <h5 style="color:rgb(102, 102, 102)">Booking Status</h5>
+      
+            <div style="display: flex;margin:24px 0px">
+              <div style="padding: 20px">
+                <div style="background: lawngreen;height: 12px;width: 12px;border-radius: 50%"></div>
+              </div>
+              <div style="flex:1">
+                <ion-label>
+                  <h2 style="margin-bottom: 8px">Booking Accepted</h2>
+                  <p>Booking accepted on {{bookedOnDate.toDateString()}}</p>
+                </ion-label>
+              </div>
+            </div>
+      
+            <div style="display: flex;margin:24px 0px">
+              <div style="padding: 20px">
+                <div style="background: lawngreen;height: 12px;width: 12px;border-radius: 50%"></div>
+              </div>
+              <div style="flex:1">
+                <ion-label>
+                  <h2 style="margin-bottom: 8px">Service Scheduled For</h2>
+                  <p>Work Will begin on {{bookedForDate.toDateString()}}</p>
+                </ion-label>
+              </div>
+            </div>
+      
+            <div style="display: flex;margin:24px 0px">
+              <div style="padding: 20px">
+                <div style="border:1px solid lawngreen;height: 20px;width: 20px;border-radius: 50%">
+                  <div style="background: lawngreen;height: 12px;width: 12px;border-radius: 50%;margin: 3px 0px 0px 3px">
+                  </div>
+                </div>
+      
+              </div>
+              <div style="flex:1">
+                <ion-label>
+                  <h2 style="margin-bottom: 8px">Completed</h2>
+                  <p>Work Completed on 
+
+                      <span *ngIf="!order.slot.isExtended">{{bookedForDate.toDateString()}}</span> 
+                      <span *ngIf="order.slot.isExtended">{{bookedForNextDate.toDateString()}}</span>
+                      {{order.slot.deliveryTime}}
+                  </p>
+                </ion-label>
+              </div>
+            </div>
+      
+          </div>
+        </div>
+      
+      
+      
+      </ion-content>

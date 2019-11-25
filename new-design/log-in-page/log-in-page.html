@@ -1,0 +1,50 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-back-button></ion-back-button>
+        </ion-buttons>
+        <ion-title>
+            Log In
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+    <div style="padding: 16px">
+        <ion-item style="padding-top: 8px 8px 0px 8px;border:none">
+            <ion-label position="floating">Email</ion-label>
+            <ion-input inputmode="email" [(ngModel)]="emailText"></ion-input>
+        </ion-item>
+
+        <ion-item style="padding: 8px 8px 0px 8px;border:none">
+            <ion-label position="floating">Password</ion-label>
+            <ion-input type="password" [(ngModel)]="passwordText"></ion-input>
+        </ion-item>
+
+        <ion-button expand="full" style="margin: 24px 16px" (click)="loginWithEmail()">Log In</ion-button> 
+        <!-- navigateToMainPage -->
+        <ion-label style="width: 100%;text-align: center">
+            <p>
+                Dont have an account? <a (click)="navigateToSignUpPage()" style="text-decoration: none">Register</a>
+            </p>
+        </ion-label>
+
+        <div style="text-align: center;padding:20px">
+            --OR--
+        </div>
+
+        <div style="display: flex;">
+            <div style="flex:1;padding: 16px">
+                <ion-button expand="full" fill="outline" color="primary" (click)="loginWithFacebook()">Facebook</ion-button>
+            </div>
+            <div style="flex:1;padding: 16px">
+                    <ion-button expand="full" fill="outline" color="danger" (click)="loginWithGooglePlus()">Google</ion-button>
+            </div>
+        </div>
+
+    </div>
+
+
+
+</ion-content>

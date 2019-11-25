@@ -1,0 +1,105 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        
+        <ion-title>
+            Profile Settings
+        </ion-title>
+
+        <ion-buttons slot="secondary">
+                <ion-button (click)="closeClick()">
+                  <ion-icon slot="icon-only" name="close"></ion-icon>
+                </ion-button>
+                
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+    <div style="padding: 16px">
+        <!-- location settings -->
+        <div>
+                <div style="padding:10px 0px;overflow: auto;">
+                        <ion-label position="floating">Location Settings</ion-label>
+                </div>
+            <ion-searchbar (ionFocus)="showResultsPane=true" (ionInput)="filterAreas($event)"
+                placeholder="Search your locality" search-icon="search" mode="ios">
+            </ion-searchbar>
+
+           
+
+            <ion-list *ngIf="showResultsPane && selArea.length >0">
+                    <ion-list-header>Search Locations</ion-list-header>
+                    <ion-radio-group *ngIf="filteredAreaList && filteredAreaList.length > 0"
+                            (ionChange)="areaSelected($event)">
+                            <ion-item *ngFor="let resArea of filteredAreaList" lines="none">
+                                <ion-icon slot="start" name="pin"></ion-icon>
+                                <ion-label>
+                                        <h3>{{resArea.name}},{{resArea.city}}</h3>
+                                        <p>Area</p>
+                                </ion-label>
+                                <ion-radio [value]="resArea" slot="end" color="primary"></ion-radio>
+                            </ion-item>
+                    </ion-radio-group>
+                    <ion-item *ngIf="!filteredAreaList || filteredAreaList.length <= 0" lines="none">
+                            <ion-icon name="pin"></ion-icon>
+                            <ion-label>No Results Found</ion-label>
+                        </ion-item>
+
+            </ion-list>
+            <ion-list *ngIf="!showResultsPane">
+                    <ion-list-header>Recent Locations</ion-list-header>
+                    <ion-radio-group *ngIf="recentLocationList && recentLocationList.length > 0"
+                            (ionChange)="areaSelected($event)">
+                            <ion-item *ngFor="let resArea of recentLocationList" lines="none">
+                                <ion-icon slot="start" name="pin"></ion-icon>
+                                <ion-label>
+                                        <h3>{{resArea.name}},{{resArea.city}}</h3>
+                                        <p>Area</p>
+                                </ion-label>
+                                <ion-radio [value]="resArea" slot="end" color="primary"></ion-radio>
+                            </ion-item>
+                        </ion-radio-group>
+                </ion-list>
+        </div>
+        <!-- Complete profile -->
+        <ion-list lines="full" class="ion-no-margin ion-no-padding">
+            <div style="padding:10px 0px;overflow: auto;">
+                    <ion-label position="floating">Profile Settings</ion-label>
+            </div>
+               
+                <ion-item>
+                    <ion-label position="floating">Display Name
+                    </ion-label>
+                    <ion-input type="text" [(ngModel)]="userProfile.displayName"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">Mobile <ion-text color="danger">*</ion-text>
+                    </ion-label>
+                    <ion-input required inputmode="tel" [(ngModel)]="userProfile.phoneNumber"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">Vehicle Reg No</ion-label>
+                    <ion-input type="text" [(ngModel)]="userProfile.regNo"></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label>Vehicle Type</ion-label>
+                    <ion-select placeholder="Select Vehicle Type" [(ngModel)]="userProfile.vehicleType">
+                        <ion-select-option value="hatchback">Hatchback</ion-select-option>
+                        <ion-select-option value="sedan">Sedan</ion-select-option>
+                        <ion-select-option value="suv">SUV</ion-select-option>
+                        <ion-select-option value="twowheeler">Two Wheeler</ion-select-option>
+                    </ion-select>
+                </ion-item>
+
+            </ion-list>
+    </div>
+</ion-content>
+
+<ion-footer>
+    <ion-toolbar>
+        <ion-button [disabled]="!userSelectedArea" shape="round" expand="full" style="margin: 24px 16px" (click)="confirmClick()">Confirm</ion-button>
+    </ion-toolbar>
+</ion-footer>

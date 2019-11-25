@@ -1,0 +1,55 @@
+<ion-header>
+        <ion-toolbar color="primary">
+            <ion-buttons slot="start">
+                <ion-back-button></ion-back-button>
+            </ion-buttons>
+            <ion-title>
+                Select Your Package
+            </ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    <ion-content *ngIf="vendor">
+        <ion-list>
+                <ion-radio-group (ionChange)="packageSelectionchange($event)">
+                    <ion-item *ngFor="let pack of vendor.packageMatrix">
+                        <ion-thumbnail slot="start">
+                            <div class="price-box"> ${{pack.price}}</div>
+                        </ion-thumbnail>
+
+                            <ion-label> 
+                                <h5>{{pack.packageName}}</h5>
+                                <p style="white-space: normal;">
+                                    {{pack.description}}
+                                </p>
+                            </ion-label>
+                            <ion-radio slot="end" [value]="pack.code"></ion-radio>
+                    </ion-item>
+                    
+                  
+               
+            </ion-radio-group>
+        </ion-list>
+
+    </ion-content>
+    <ion-footer>
+            <ion-toolbar>
+             
+                <ion-grid>
+                    <ion-row>
+                        <ion-col size="6">
+                            <ion-item lines="none">
+                                    <ion-label>
+                                            <p>Subtotal</p>
+                                            <h1>${{subTotal}}</h1>
+                                        </ion-label>
+                            </ion-item>
+                            
+                        </ion-col>
+                        <ion-col (click)="proceedClick()" size="6"><ion-button color="primary" expand="block" fill="outline" [disabled]="!selectedPackage">Proceed</ion-button></ion-col>
+                    </ion-row>
+                </ion-grid>
+                    
+            </ion-toolbar>
+          </ion-footer>
+    

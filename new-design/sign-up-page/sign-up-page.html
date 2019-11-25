@@ -1,0 +1,41 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-back-button></ion-back-button>
+        </ion-buttons>
+        <ion-title>
+            Sign Up
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+    <div style="padding: 16px">
+        <ion-item style="padding-top: 8px 8px 0px 8px;border:none">
+            <ion-label position="floating">Email</ion-label>
+            <ion-input inputmode="email" [(ngModel)]="emailText"></ion-input>
+        </ion-item>
+
+        <ion-item style="padding: 8px 8px 0px 8px;border:none">
+            <ion-label position="floating">Password</ion-label>
+            <ion-input type="password" [(ngModel)]="passwordText"></ion-input>
+        </ion-item>
+
+        <ion-item style="padding: 8px 8px 0px 8px;border:none">
+            <ion-label position="floating">Confirm Password</ion-label>
+            <ion-input type="password" [(ngModel)]="passwordConfrimText"></ion-input>
+        </ion-item>
+
+        <ion-button expand="full" style="margin: 24px 16px" (click)="signUpWithEmail()">Sign Up</ion-button>
+        <ion-label style="width: 100%;text-align: center">
+            <p>
+                Already have an account? <a (click)="navigateLogInPage()" style="text-decoration: none">Log in</a>
+            </p>
+        </ion-label>
+
+    </div>
+
+
+
+</ion-content>

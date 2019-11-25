@@ -1,0 +1,72 @@
+<ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>
+          My Bookings
+        </ion-title>
+      </ion-toolbar>
+    </ion-header>
+    
+    <ion-content>
+
+
+         <ion-segment [value]="segmentValue" (ionChange)="segmentChanged($event)">
+               <ion-segment-button value="upcoming">
+                 <ion-label>Upcoming</ion-label>
+               </ion-segment-button>
+               <ion-segment-button value="past">
+                 <ion-label>Past</ion-label>
+               </ion-segment-button>
+             </ion-segment>
+
+
+
+    
+        <ion-list *ngIf="segmentValue == 'upcoming'">
+            <ion-list-header>
+                  Upcoming
+            </ion-list-header>
+    
+            <ion-item  class="ion-activatable" *ngFor="let pb of pendingBookings" (click)="navigateToBookingDetails(pb)">
+                <ion-chip outline color="{{getStatusColor(pb.status)}}" slot="end">
+                    <ion-label>{{getStatusLabel(pb.status)}}</ion-label>
+                </ion-chip>
+                
+              <ion-label>
+                <h2>{{pb.ui.packageName}}</h2>
+                <p>{{pb.ui.vendorName}}</p>
+                <p>{{pb.slot.date}} {{pb.slot.time}}</p>
+                <p>Rs {{pb.totalPrice}}</p>
+              </ion-label>
+              <ion-ripple-effect></ion-ripple-effect>
+    
+            </ion-item>
+            
+            
+          </ion-list>
+    
+          <ion-list *ngIf="segmentValue == 'past'">
+            <ion-list-header>
+              Past
+            </ion-list-header>
+            <ion-item   class="ion-activatable" *ngFor="let cb of completedBookings" (click)="navigateToBookingDetails(cb)">
+                <ion-chip outline color="{{getStatusColor(cb.status)}}" slot="end">
+                    <ion-label>{{getStatusLabel(cb.status)}}</ion-label>
+                </ion-chip>
+                
+              <ion-label>
+                <h2>{{cb.ui.packageName}}</h2>
+                <h3>{{cb.ui.vendorName}}</h3>
+                <p>{{cb.slot.date}} {{cb.slot.time}}</p>
+                <p>Rs {{cb.totalPrice}}</p>
+              </ion-label>
+
+              <ion-ripple-effect></ion-ripple-effect>
+    
+            </ion-item>
+            
+    
+           
+          </ion-list>
+    
+    </ion-content>
+    
