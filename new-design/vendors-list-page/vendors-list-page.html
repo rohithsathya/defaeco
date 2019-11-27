@@ -1,34 +1,39 @@
+
 <ion-header>
     <!-- <ion-toolbar color="primary">
         <ion-title>
             Car Washes Near Me
         </ion-title>
     </ion-toolbar> -->
-    <ion-toolbar>
-            <ion-item lines="none">        
-                    <ion-label>
-                        <h2 style="font-size: 20px;margin-bottom: 5px;">Car Washes @</h2>
-                        <p style="font-size: 16px;"><ion-icon name="pin" color="primary"></ion-icon> 
-                            <span *ngIf="!location">Choose Your Location</span>
-                            <span *ngIf="location">{{location.name}},{{location.city}}</span>
-                        </p>
-                    </ion-label>
-                    <ion-button slot="end" fill="clear" (click)="changeLocationClick()">
-                           <span *ngIf="location">change</span> 
-                           <span *ngIf="!location">Choose</span> 
-                    </ion-button>
-                    
-                    
-            </ion-item>
+    <ion-toolbar color="dark">
+            <ion-buttons slot="start">
+                    <ion-menu-button autoHide="false"></ion-menu-button>
+                  </ion-buttons>
+        <ion-item lines="none" color="dark">
+            <ion-label>
+                <h2 style="font-size: 20px;margin-bottom: 5px;">Car Washes @</h2>
+                <p style="font-size: 16px;">
+                    <ion-icon name="pin" color="primary"></ion-icon>
+                    <span *ngIf="!location">Choose Your Location</span>
+                    <span *ngIf="location">{{location.name}},{{location.city}}</span>
+                </p>
+            </ion-label>
+            <ion-button slot="end" fill="clear" (click)="changeLocationClick()">
+                <span *ngIf="location">change</span>
+                <span *ngIf="!location">Choose</span>
+            </ion-button>
+
+
+        </ion-item>
     </ion-toolbar>
     <ion-toolbar *ngIf="vendorsList && vendorsList.length >0">
-            <ion-searchbar (ionChange)="filterVendorsList($event)" mode="ios"></ion-searchbar>
+        <ion-searchbar (ionChange)="filterVendorsList($event)" mode="ios"></ion-searchbar>
     </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-       
+
 
     <ion-list>
         <ion-item class="ion-activatable" *ngFor="let vendor of vendorsList" (click)="goToVendorDetails(vendor)">
@@ -48,11 +53,13 @@
     </ion-list>
 
     <ion-label *ngIf="!location">
-        <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">Please Select your location to continue... </h2>
+        <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">Please Select your location to continue...
+        </h2>
     </ion-label>
 
     <ion-label *ngIf="location && vendorsList && vendorsList.length <=0">
-            <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">No Vendors Found, for selected Location.</h2>
+        <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">No Vendors Found, for selected Location.
+        </h2>
     </ion-label>
 
 

@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { VendorDataService } from '../services/vendors.data.service';
 import { LoginService } from '../services/login.service';
 import { DefaecoVendor } from '../services/interfaces/DefaecoVendor';
+import { AuthenticationService } from '../services/authentication.service';
 
 @Component({
   selector: 'app-vendors-list-page',
@@ -23,9 +24,21 @@ export class AppVendorsListPagePage implements OnInit, OnDestroy {
   location;
   locationText;
   vendorListSubscription: Subscription;
-  constructor(public popoverController: PopoverController, public dataService: DataService, private router: Router, public modalController: ModalController, public vendorService: VendorDataService, private loginService: LoginService) { }
+  constructor(public popoverController: PopoverController, public dataService: DataService, private router: Router, public modalController: ModalController, public vendorService: VendorDataService, private loginService: LoginService,private authService:AuthenticationService) { }
   ngOnInit(){}
+
+  ionViewCanEnter(){
+    console.log("Can Enter");
+  }
+  ionViewCanLeave(){
+    console.log("Can Leave");
+  }
+
+
   async ionViewWillEnter() {
+    console.log("ion view will enter");
+    let user = await this.authService.getLoggedInUser();
+    console.log("logged in user->>>>>>>>>>>>>>>>>>>>",user);
     let busySpinner: any;
     try {
 

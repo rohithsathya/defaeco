@@ -7,6 +7,11 @@ import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { Storage } from '@ionic/storage';
 import { DataService } from '../services/data.service';
 import { LoginService } from '../services/login.service';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { AuthenticationService } from '../services/authentication.service';
+import { NavController } from '@ionic/angular';
+import { NavigationOptions } from '@ionic/angular/dist/providers/nav-controller';
+import { UiService } from '../services/ui.service';
 
 @Component({
     selector: 'app-log-in-page',
@@ -19,40 +24,32 @@ export class AppLogInPage implements OnInit{
     emailText:string='';
     passwordText:string='';
 
-    constructor(private router: Router, private fb: Facebook, private fireAuth: AngularFireAuth,private gplus: GooglePlus,private dataService: DataService,private loginService:LoginService) { }
+    constructor(private router: Router, private fb: Facebook, private fireAuth: AngularFireAuth,private gplus: GooglePlus,private dataService: DataService,private loginService:LoginService,private authService:AuthenticationService,private navCtrl: NavController,private uiService:UiService) { }
     ngOnInit(){}
-    async ionViewWillEnter(){
-        this.handleUserLogIn();
-    }
-    //NOTES : Busy spinner
-    //show busySpiner
-    //let busySpinner:any = await this.dataService.presentBusySpinner();
-    //await busySpinner.dismiss(); //hide busy spinner
-
-    async handleUserLogIn(){
-        let busySpinner:any = await this.dataService.presentBusySpinner();
-        try{
-            
-            this.user = await this.loginService.getLoggedInUser();
+    async ionViewWillEnter() {
+        let busySpinner: any = await this.dataService.presentBusySpinner();
+        try {
+            this.user = await this.authService.getVerifiedLoginUser();
+            if (this.user) {
+                this.navigateToMainPage();
+            }
             await busySpinner.dismiss();
-            if(this.user && this.user.accountVerified){
-                this.dataService.navigateToMainPage();
-            }
-            else if(this.user && !this.user.accountVerified){
-                await this.dataService.logOutUser();
-                this.dataService.presentToast("Email not verified, please verify your email, by clicking the verification link sent to your email");
-            }
-        }catch(e){
-            this.dataService.hideLoadingPopup();
-            alert(`Error occured ${JSON.stringify(e)}`);
+
+        } catch (e) {
+            console.log("ERROR!!!>>>>>AppLogInPage.ts>>>>>ionViewWillEnter()", e);
             await busySpinner.dismiss();
         }
-
-
+        //this.handleUserLogIn();
     }
-    navigateToSignUpPage() {
-        this.router.navigate(['/', 'sign-up']);
+    private navigateToMainPage(){
+        this.navCtrl.navigateRoot("main/vendors-list",{animated: true});
     }
+    private navigateToLandingPage(){
+        this.navCtrl.navigateRoot("",{animated: true})
+    }
+    private navigateToSignUpPage() {
+        this.navCtrl.navigateRoot('sign-up',{animated: true});
+    }    
 
     //email
     async loginWithEmail(){
@@ -70,13 +67,19 @@ export class AppLogInPage implements OnInit{
             }
 
             if(emailValid && passwordValid){
-                //this.dataService.showLoadingPopup();
-                busySpinner = await this.dataService.presentBusySpinner();
-                await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                busySpinner = await this.uiService.presentBusySpinner();
+                await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL); //https://firebase.google.com/docs/auth/web/auth-state-persistence
                 await this.fireAuth.auth.signInWithEmailAndPassword(this.emailText,this.passwordText);
+
+                this.user = await this.authService.getVerifiedLoginUser();
+                if (this.user) {
+                    this.navigateToMainPage();
+                }else{
+                    this.uiService.presentToast("Email not verified, please verify your email, by clicking the verification link sent to your email");
+                }
                 await busySpinner.dismiss();
-                //this.dataService.hideLoadingPopup();
-                this.handleUserLogIn();
+
+                //this.handleUserLogIn();
             }
             
         }catch(e){
@@ -110,7 +113,7 @@ export class AppLogInPage implements OnInit{
     }
     async onFBLoginSuccess(res: FacebookLoginResponse) {
         //this.dataService.showLoadingPopup();
-        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         await this.fireAuth.auth.signInWithCredential(firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken));
         //this.dataService.hideLoadingPopup();
         this.handleUserLogIn();
@@ -127,7 +130,7 @@ export class AppLogInPage implements OnInit{
                 'scopes': 'profile email'
               })
             //this.dataService.showLoadingPopup();
-            await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+            await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
             await this.fireAuth.auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gplusUser.idToken));
             //this.dataService.hideLoadingPopup();
             this.handleUserLogIn();
@@ -138,6 +141,27 @@ export class AppLogInPage implements OnInit{
 
        
 
+
+    }
+    //extra
+    async handleUserLogIn(){
+        let busySpinner:any = await this.uiService.presentBusySpinner();
+        try{
+            
+            this.user = await this.authService.getLoginUser();
+            await busySpinner.dismiss();
+            if(this.user && this.user.accountVerified){
+                this.navigateToMainPage();
+            }
+            else if(this.user && !this.user.accountVerified){
+                await this.authService.logOutUser();
+                this.uiService.presentToast("Email not verified, please verify your email, by clicking the verification link sent to your email");
+            }
+        }catch(e){
+            this.uiService.presentToast("Some error occured");
+            console.log("Error>>>>log-in-page.ts>>>>handleUserLogIn()",e);
+            await busySpinner.dismiss();
+        }
 
     }
 }

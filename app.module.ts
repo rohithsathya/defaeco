@@ -59,6 +59,9 @@ import { BookingConfirmedPage } from './new-design/booking-confirmed/booking-con
 import { EditPersonalDetailsPage } from './new-design/edit-personal-information/edit-personal-information';
 import { OrderService } from './new-design/services/order.service';
 import { AppSlotReshudlePage } from './new-design/slot-reschudle-page/slot-reschudle-page';
+import { AuthenticationService } from './new-design/services/authentication.service';
+import { DefaecoWelcomePageComponent } from './production/components/welcome-page/welcome-page';
+import { UiService } from './new-design/services/ui.service';
 
 @NgModule({
   declarations: [
@@ -81,7 +84,9 @@ import { AppSlotReshudlePage } from './new-design/slot-reschudle-page/slot-resch
     AppMyBookingPage,
     BookingConfirmedPage,
     EditPersonalDetailsPage,
-    AppSlotReshudlePage
+    AppSlotReshudlePage,
+    //Production
+    DefaecoWelcomePageComponent,
   ],
   entryComponents: [
     AppLocationSelectionComponent
@@ -110,6 +115,8 @@ import { AppSlotReshudlePage } from './new-design/slot-reschudle-page/slot-resch
     SlotService,
     LoginService,
     OrderService,
+    AuthenticationService,
+    UiService,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: StorageBucket, useValue: 'uploads' }

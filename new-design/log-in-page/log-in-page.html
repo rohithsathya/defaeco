@@ -1,7 +1,9 @@
 <ion-header>
-    <ion-toolbar color="primary">
+    <ion-toolbar color="dark">
         <ion-buttons slot="start">
-            <ion-back-button></ion-back-button>
+                <ion-button (click)="navigateToLandingPage()">
+                    <ion-icon slot="start" name="close"></ion-icon>
+                </ion-button>
         </ion-buttons>
         <ion-title>
             Log In
@@ -23,7 +25,7 @@
         </ion-item>
 
         <ion-button expand="full" style="margin: 24px 16px" (click)="loginWithEmail()">Log In</ion-button> 
-        <!-- navigateToMainPage -->
+        
         <ion-label style="width: 100%;text-align: center">
             <p>
                 Dont have an account? <a (click)="navigateToSignUpPage()" style="text-decoration: none">Register</a>

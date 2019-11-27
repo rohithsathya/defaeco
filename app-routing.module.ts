@@ -18,6 +18,7 @@ import { AppAccountPage } from './new-design/account-page/account-page';
 import { BookingConfirmedPage } from './new-design/booking-confirmed/booking-confirmed.page';
 import { EditPersonalDetailsPage } from './new-design/edit-personal-information/edit-personal-information';
 import { AppSlotReshudlePage } from './new-design/slot-reschudle-page/slot-reschudle-page';
+import { DefaecoWelcomePageComponent } from './production/components/welcome-page/welcome-page';
 
 const routes: Routes = [
 
@@ -53,6 +54,9 @@ const routes: Routes = [
   { path: 'booking', component: AppMyBookingPage },
   { path: 'edit-profile', component:EditPersonalDetailsPage},
   { path: 'payment', loadChildren: './payment/payment.module#PaymentPageModule' },
+
+  //production
+  {path: 'd-welcome',component:DefaecoWelcomePageComponent}
 
 
 ];

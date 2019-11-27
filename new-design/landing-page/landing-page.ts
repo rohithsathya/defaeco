@@ -1,35 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { DataService } from '../services/data.service';
+import { NavController } from '@ionic/angular';
 
 @Component({
     selector: 'app-landing-page',
     templateUrl: 'landing-page.html',
     styleUrls: ['landing-page.scss']
 })
-export class LandingPage implements OnInit {
-
-    user;
+export class LandingPage {
+    
     slideOpts = {
         initialSlide: 0,
         speed: 300
       };
 
-    constructor(private router: Router,private dataService:DataService ) { }
-      ngOnInit(){}
-    async ionViewWillEnter(){
-        this.dataService.showLoadingPopup();
-        this.user = await this.dataService.getLoggedInUser();
-        this.dataService.hideLoadingPopup();
-        
-        if(this.user && this.user.accountVerified){
-            this.dataService.navigateToMainPage();
-        }
-        
-    }
+    constructor(private navCtrl: NavController) { }
 
     navigateToLoginPage() {
-        this.dataService.navigateToLoginPage();
+        this.navCtrl.navigateForward("login");
     }
 
 }
