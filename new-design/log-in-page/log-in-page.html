@@ -38,10 +38,14 @@
 
         <div style="display: flex;">
             <div style="flex:1;padding: 16px">
-                <ion-button expand="full" fill="outline" color="primary" (click)="loginWithFacebook()">Facebook</ion-button>
+                <ion-button class="fb-btn" expand="full" (click)="loginWithFacebook()">
+                        <ion-icon name="logo-facebook" slot="start"></ion-icon>Facebook
+                </ion-button>
             </div>
             <div style="flex:1;padding: 16px">
-                    <ion-button expand="full" fill="outline" color="danger" (click)="loginWithGooglePlus()">Google</ion-button>
+                    <ion-button class="g-plus-btn" expand="full" (click)="loginWithGooglePlus()">
+                            <ion-icon name="logo-googleplus" slot="start"></ion-icon> Google
+                    </ion-button>
             </div>
         </div>
 

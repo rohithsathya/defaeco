@@ -3,6 +3,7 @@ import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor, DefaecoVendorPackageAddons, DefaecoVendorPackage } from '../services/interfaces/DefaecoVendor';
 import { NavController } from '@ionic/angular';
+import { AuthenticationService, User } from '../services/authentication.service';
 
 @Component({
     selector: 'app-option-selection-page',
@@ -27,28 +28,51 @@ export class AppOptionSelectionPage implements OnInit {
     selectedAddOns:string[] = [];
     grandTotal:number = 0;
     selectedAddonIds:string[] = [];
-    constructor(private router: Router, private vendorService:VendorDataService,private route: ActivatedRoute,private navCtrl: NavController) { }
+    user:User;
+    skeletonElements:any[] = Array(5);
+    isLoading:boolean = false;
+    constructor(private router: Router, 
+        private vendorService:VendorDataService,
+        private authService:AuthenticationService,
+        private route: ActivatedRoute,
+        private navCtrl: NavController) { }
     ngOnInit(){}
     ionViewWillEnter(){
-        this.route.queryParams.subscribe(async (params) => {
-            this.vendorId = params["vendorId"];
-            this.selectedPackageId = params["selectedPackage"];
-            if(this.vendorId){
-                this.vendor =  await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
-                this.parseVendorAndGetAddons();
-                this.grandTotal = this.selectedPackage.price;
-                this.selectedPackage.addOns = this.selectedPackage.addOns.map((d)=>{
-                    //d.meta = {};
-                    d.meta.selected = false;
-                    return d;
-                })
-                //this.addOnOptions = this.selectedPackage.addOns;
-            }
-            else{
-                //if vendor is not present go to listing page
-                this.gobackToListingPage();
-              }
-        }); 
+
+        this.user = this.authService.getCurrentUser();
+        if (this.user) {
+            this.init();
+        } else {
+            this.navigateToWelcomePage();
+        }
+    }
+    init(){
+        try{
+            this.isLoading = true;
+            this.route.queryParams.subscribe(async (params) => {
+                this.vendorId = params["vendorId"];
+                this.selectedPackageId = params["selectedPackage"];
+                if(this.vendorId){
+                    this.vendor =  await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
+                    this.parseVendorAndGetAddons();
+                    this.grandTotal = this.selectedPackage.price;
+                    this.selectedPackage.addOns = this.selectedPackage.addOns.map((d)=>{
+                        d.meta.selected = false;
+                        return d;
+                    });
+                    this.isLoading = false;
+                }
+                else{
+                    this.isLoading = false;
+                    this.gobackToListingPage();
+                  }
+            })
+        }catch(e){
+            this.isLoading = false;
+            console.log("Error",e);
+        }
+        
+        
     }
     parseVendorAndGetAddons(){
         for(let i=0;i<this.vendor.packageMatrix.length;i++){
@@ -75,22 +99,13 @@ export class AppOptionSelectionPage implements OnInit {
         this.navCtrl.navigateRoot('', { animated: true });
     }
     navigateToPackSelPage(){
-        let navigationExtras: NavigationExtras = {
-            queryParams: {
-                "vendorId": this.vendor.id
-            }
-          };
-        this.router.navigate(['/', 'pack-sel'],navigationExtras);
+        this.navCtrl.navigateBack(`pack-sel?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
     }
     proceedClick(){
-        let navigationExtras: NavigationExtras = {
-            queryParams: {
-                "vendorId": this.vendor.id,
-                "selectedPackage":this.selectedPackageId,
-                "addons":this.selectedAddonIds
-            }
-          };
-        this.router.navigate(['/', 'pick-slot'],navigationExtras);
+        this.navCtrl.navigateForward(`pick-slot?vendorId=${encodeURI(this.vendor.id)}&selectedPackage=${encodeURI(this.selectedPackageId)}&addons=${encodeURI(this.selectedAddonIds.toString())}`, { animated: true });
     }
+    navigateToWelcomePage(){
+        this.navCtrl.navigateRoot('welcome', { animated: true });
+      }
 
 }

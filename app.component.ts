@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { Platform, NavController, MenuController } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { AuthenticationService } from './new-design/services/authentication.service';
 
 @Component({
   selector: 'app-root',
@@ -10,17 +11,22 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
   styleUrls: ['app.component.scss']
 })
 export class AppComponent {
+  setupDone:boolean = false;
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private navCtrl: NavController,
-    private menuCtrl: MenuController
+    private menuCtrl: MenuController,
+    private authService: AuthenticationService, 
   ) {
     this.initializeApp();
   }
 
-  initializeApp() {
+  async initializeApp() {
+    await this.authService.setupUser();
+    this.setupDone = true;
+    console.log("App initialize");
     this.platform.ready().then(() => {
       //this.statusBar.styleDefault();
       this.statusBar.backgroundColorByHexString("#03182c");

@@ -4,6 +4,7 @@ import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor } from '../services/interfaces/DefaecoVendor';
 import { UiService } from '../services/ui.service';
 import { NavController } from '@ionic/angular';
+import { AuthenticationService, User } from '../services/authentication.service';
 
 @Component({
     selector: 'app-vendor-details-page',
@@ -18,22 +19,53 @@ export class AppVendorDetailsPage implements OnInit {
       };
     vendor:DefaecoVendor = new DefaecoVendor();
     vendorId:string;
+    user:User;
+    isLoading:boolean = false;
       
-    constructor(private router: Router,private vendorService:VendorDataService,private route: ActivatedRoute,private uiService:UiService,private navCtrl: NavController) { }
+    constructor(private router: Router,
+        private vendorService:VendorDataService,
+        private route: ActivatedRoute,
+        private authService:AuthenticationService,
+        private navCtrl: NavController) { }
     ngOnInit(){}
     ionViewWillEnter(){
-        this.route.queryParams.subscribe(async (params) => {
-            this.vendorId = params["vendorId"];
-            if(this.vendorId){
-                this.vendor =  await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
+        this.user = this.authService.getCurrentUser();
+        if (this.user) {
+            this.route.queryParams.subscribe(async (params) => {
+                try{
+                    this.isLoading = true;
+                    await this.handleVendorId(params);
+                    this.isLoading = false;
+                }catch(e){
+                    console.log("Error",e);
+                    this.isLoading = false;
+                }
+            }); 
+        }else{
+            this.navigateToWelcomePage();
+        }
+    }
+    async handleVendorId(params) {
+        return new Promise(async(resolve,reject)=>{
+            try{
+                if(params){
+                    this.vendorId = params["vendorId"];
+                    if (this.vendorId) {
+                        this.vendor = await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
+                        resolve();
+                    }
+                    else {
+                        resolve();
+                        this.navigateToVendorsPage();
+                    }
+                }
+    
+            }catch(e){
+                console.log("Error",e);
+                reject(e);
             }
-            else{
-                //if vendor is not present go to listing page
-                this.navigateToVendorsPage();
-              }
-
-
-        }); 
+        })
+ 
     }
     parseDefaecTimeToTime(time){
         let timeStr = '';
@@ -50,16 +82,19 @@ export class AppVendorDetailsPage implements OnInit {
     navigateToVendorsPage(){
         this.navCtrl.navigateRoot('', { animated: true });
     }
+    navigateToWelcomePage(){
+        this.navCtrl.navigateRoot('welcome', { animated: true });
+      }
     
     bookServiceClick(){
-        let navigationExtras: NavigationExtras = {
-            queryParams: {
-                "vendorId": this.vendor.id
-            }
-          };
-        //this.navCtrl.navigateRoot(`vendors?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
+        // let navigationExtras: NavigationExtras = {
+        //     queryParams: {
+        //         "vendorId": this.vendor.id
+        //     }
+        //   };
+        this.navCtrl.navigateForward(`confirm-personal-details?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
         
-        this.router.navigate(['/', 'confirm-personal-details'],navigationExtras); //main
+        //this.router.navigate(['/', 'confirm-personal-details'],navigationExtras); //main
     }
 
 }

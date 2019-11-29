@@ -1,61 +1,90 @@
 <ion-header>
-        <ion-toolbar color="dark">
-            <ion-buttons slot="start">
-                    <ion-button (click)="navigateToPackSelPage()">
-                            <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
-                        </ion-button>
-            </ion-buttons>
-            <ion-title>
-                Select Addons
-            </ion-title>
-        </ion-toolbar>
-    </ion-header>
+    <ion-toolbar color="dark">
+        <ion-buttons slot="start">
+            <ion-button (click)="navigateToPackSelPage()">
+                <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>
+            Select Addons
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
 
-    <ion-content>
-
+<ion-content>
+    <div *ngIf="!isLoading">
         <ion-list *ngIf="selectedPackage">
-                <ion-radio-group (ionChange)="addOnSelectionChange($event)">
-                    <ion-item *ngFor="let pack of selectedPackage.addOns">
-                        <ion-thumbnail slot="start">
-                            <div style="color:#1565C0"> 
-                                <span style="font-size: 12px;">$</span>
-                                <span style="font-size: 20px;font-weight: 900;">{{pack.price}}</span>
-                            </div>
-                        </ion-thumbnail>
+            <ion-radio-group (ionChange)="addOnSelectionChange($event)">
+                <ion-item *ngFor="let pack of selectedPackage.addOns">
+                    <ion-thumbnail slot="start">
+                        <div style="color:#1565C0">
+                            <span style="font-size: 12px;">$</span>
+                            <span style="font-size: 20px;font-weight: 900;">{{pack.price}}</span>
+                        </div>
+                    </ion-thumbnail>
 
-                            <ion-label> 
-                                <h5>{{pack.name}}</h5>
-                                <p style="white-space: normal;">
-                                    {{pack.description}}
-                                </p>
-                            </ion-label>
-                            <ion-checkbox [(ngModel)]="pack.meta.selected" slot="end"></ion-checkbox>
-                    </ion-item>
-                    
-                  
-               
+                    <ion-label>
+                        <h5>{{pack.name}}</h5>
+                        <p style="white-space: normal;">
+                            {{pack.description}}
+                        </p>
+                    </ion-label>
+                    <ion-checkbox [(ngModel)]="pack.meta.selected" slot="end"></ion-checkbox>
+                </ion-item>
+
+
+
             </ion-radio-group>
+            <ion-item lines="none">
+                    <ion-label *ngIf="selectedPackage.addOns.length<=0">
+                        No Addons Found
+                    </ion-label>
+                </ion-item>
         </ion-list>
+    </div>
+    <div *ngIf="isLoading">
+        <ion-list>
+            <ion-item *ngFor="let pack of skeletonElements">
+                <ion-thumbnail slot="start">
+                    <ion-skeleton-text animated></ion-skeleton-text>
+                </ion-thumbnail>
 
-    </ion-content>
-    <ion-footer>
-            <ion-toolbar>
-             
-                <ion-grid>
-                    <ion-row>
-                        <ion-col size="6">
-                            <ion-item lines="none">
-                                    <ion-label>
-                                            <p>Subtotal</p>
-                                            <h1>${{grandTotal}}</h1>
-                                        </ion-label>
-                            </ion-item>
-                            
-                        </ion-col>
-                        <ion-col (click)="proceedClick()" size="6"><ion-button color="primary" expand="block" fill="outline">Proceed</ion-button></ion-col>
-                    </ion-row>
-                </ion-grid>
-                    
-            </ion-toolbar>
-          </ion-footer>
-    
+                <ion-label>
+                    <h5>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </h5>
+                    <p style="white-space: normal;">
+                        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                    </p>
+                </ion-label>
+            </ion-item>
+        </ion-list>
+    </div>
+
+
+
+
+</ion-content>
+<ion-footer>
+    <ion-toolbar>
+
+        <ion-grid>
+            <ion-row>
+                <ion-col size="6">
+                    <ion-item lines="none">
+                        <ion-label>
+                            <p>Subtotal</p>
+                            <h1>${{grandTotal}}</h1>
+                        </ion-label>
+                    </ion-item>
+
+                </ion-col>
+                <ion-col (click)="proceedClick()" size="6">
+                    <ion-button color="primary" expand="block" fill="outline">Proceed</ion-button>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+
+    </ion-toolbar>
+</ion-footer>

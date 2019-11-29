@@ -3,8 +3,9 @@ import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor } from '../services/interfaces/DefaecoVendor';
 import { LoginService, DefaecoUserProfile } from '../services/login.service';
-import { DataService } from '../services/data.service';
 import { NavController } from '@ionic/angular';
+import { AuthenticationService, User } from '../services/authentication.service';
+import { UiService } from '../services/ui.service';
 
 @Component({
     selector: 'app-personal-details-confirm-page',
@@ -16,57 +17,69 @@ export class AppPersonalDetailConfirmPage implements OnInit {
 
     vendorId: string;
     vendor: DefaecoVendor;
-    user: any;
+    user: User;
     userProfile: DefaecoUserProfile = new DefaecoUserProfile();
-    constructor(private router: Router, private vendorService: VendorDataService, private route: ActivatedRoute, private loginService: LoginService, private dataService: DataService,private navCtrl: NavController) { }
+    isLoading:boolean = false;
+    constructor(private router: Router, 
+        private vendorService: VendorDataService, 
+        private route: ActivatedRoute, 
+        private loginService: LoginService,
+        private navCtrl: NavController,
+        private authService:AuthenticationService,
+        private uiService:UiService) { }
     ngOnInit(){}
     ionViewWillEnter() {
-        this.route.queryParams.subscribe(async (params) => {
-            this.vendorId = params["vendorId"];
-            if (this.vendorId) {
-                let busySpinner: any = await this.dataService.presentBusySpinner();
-                this.vendor = await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
-                this.user = await this.loginService.checkIfAccountIsVerified();
-                if (this.user) {
-                    this.userProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
-                } else {
-                    this.dataService.navigateToLoginPage();
+
+        this.user = this.authService.getCurrentUser();
+        if (this.user) {
+            this.route.queryParams.subscribe(async (params) => {
+                try {
+                    this.vendorId = params["vendorId"];
+                    if (this.vendorId) {
+                        this.isLoading = true;
+                        this.vendor = await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
+                        this.userProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
+                        this.isLoading = false;
+                    }
+                    else {
+                        this.gobackToListingPage();
+                    }
+
+                } catch (e) {
+                    console.log("Error", e);
+                    this.isLoading = false;
                 }
-                await busySpinner.dismiss();
-            }
-            else {
-                //if vendor is not present go to listing page
-                this.gobackToListingPage();
-            }
-
-
-        });
+            })
+        } else {
+            this.navigateToLandingPage();
+        }
     }
 
     async proceedClick() {
-
-        if (!this.userProfile.phoneNumber || !this.userProfile.regNo || !this.userProfile.vehicleType) {
-            this.dataService.presentToast("Phone Number, Vehicle Reg No and Type are manadtory, please enter all required fields");
-        } else {
-            await this.loginService.savePublicProfile(this.user.uid, this.userProfile);
-            let navigationExtras: NavigationExtras = {
-                queryParams: {
-                    "vendorId": this.vendor.id
-                }
-            };
-            this.router.navigate(['/', 'pack-sel'], navigationExtras); //main
+        let busySpinner:any= await this.uiService.presentBusySpinner();
+        try{
+            if (!this.userProfile.phoneNumber || !this.userProfile.regNo || !this.userProfile.vehicleType) {
+                busySpinner.dismiss();
+                this.uiService.presentToast("Phone Number, Vehicle Reg No and Type are manadtory, please enter all required fields");
+            } else {
+                await this.loginService.savePublicProfile(this.user.uid, this.userProfile);
+                busySpinner.dismiss();
+                this.navCtrl.navigateForward(`pack-sel?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
+            }
+        }catch(e){
+            busySpinner.dismiss();
+            console.log("Error",e);
         }
     }
     navigateToVendorsDetailsPage(){
-        let navigationExtras: NavigationExtras = {
-            queryParams: {
-                "vendorId": this.vendor.id
-            }
-        };
-        this.router.navigate(['/', 'vendor-detail'], navigationExtras); //main
+
+        this.navCtrl.navigateBack(`vendor-detail?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
     }
     gobackToListingPage() {
         this.navCtrl.navigateRoot('', { animated: true });
+    }
+    private navigateToLandingPage(){
+        this.navCtrl.navigateRoot("welcome",{animated: true})
     }
 
 }

@@ -1,9 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import * as firebase from 'firebase/app';
-import { AngularFireAuth } from '@angular/fire/auth';
 import { DataService } from '../services/data.service';
-import { LoginService } from '../services/login.service';
 import { NavController } from '@ionic/angular';
 import { UiService } from '../services/ui.service';
 import { AuthenticationService } from '../services/authentication.service';
@@ -20,53 +16,33 @@ export class SignUpPage implements OnInit {
     passwordConfrimText:String='';
     user:any;
 
-    constructor(private fireAuth: AngularFireAuth,private dataService:DataService,private navCtrl: NavController,private uiService:UiService,private authService:AuthenticationService) { }
+    constructor(private dataService:DataService,
+        private navCtrl: NavController,
+        private uiService:UiService,
+        private authService:AuthenticationService) { }
     ngOnInit(){}
     async ionViewWillEnter(){
-        let busySpinner: any = await this.uiService.presentBusySpinner();
-        try {
-            this.user = await this.authService.getVerifiedLoginUser();
-            if (this.user) {
-                this.navigateToMainPage();
-            }
-            await busySpinner.dismiss();
-
-        } catch (e) {
-            console.log("ERROR!!!>>>>>AppLogInPage.ts>>>>>ionViewWillEnter()", e);
-            await busySpinner.dismiss();
+        this.user = this.authService.getCurrentUser();
+        if (this.user) {
+            this.navigateToMainPage();
         }
     }
 
-    async signUpWithEmail(){
+    private async signUpWithEmail(){
         let busySpinner:any;
         try{
-
-            let emailValid = this.emailText && this.dataService.isValidateEmail(this.emailText);
-            let passwordValid = this.passwordText && (this.passwordText.length >=6)
-            if(!emailValid){
-                this.uiService.presentToast("Please Enter Valid Email");
-                return;
+            let areFieldsValid = this.canSignup();
+            if(areFieldsValid){
+                busySpinner= await this.uiService.presentBusySpinner();
+                let res = await this.authService.signUpWithEmail(this.emailText,this.passwordText);
+                await busySpinner.dismiss();
+                if(res && res.user){
+                    res.user.sendEmailVerification(); 
+                    this.authService.logoutUser();
+                }
+                this.uiService.presentToastWithOptions('success','Sign up successful,Please verify your email before you login.Check your Email inbox for more details');
+                this.navigateLogInPage();
             }
-            if(!passwordValid){
-                this.uiService.presentToast("Password should be 6 characters long");
-                return;
-            }
-            if(this.passwordText != this.passwordConfrimText){
-                this.uiService.presentToast("Password and Confirm password should match");
-                return;
-            }
-
-            busySpinner= await this.uiService.presentBusySpinner();
-            let res = await this.fireAuth.auth.createUserWithEmailAndPassword(this.emailText,this.passwordText);
-            await busySpinner.dismiss();
-            if(res && res.user){
-                res.user.sendEmailVerification(); 
-                this.authService.logOutUser();
-            }
-            this.uiService.presentToastWithOptions('success','Sign up successful,Please verify your email before you login.Check your Email inbox for more details');
-            this.navigateLogInPage();
-
-
         }catch(e){
             await busySpinner.dismiss();
             this.uiService.presentToastWithOptions('Error occured',e.message);
@@ -74,14 +50,31 @@ export class SignUpPage implements OnInit {
         }
        
     }
-    navigateLogInPage() {
+    private canSignup():boolean{
+        let emailValid = this.emailText && this.dataService.isValidateEmail(this.emailText);
+            let passwordValid = this.passwordText && (this.passwordText.length >=6)
+            if(!emailValid){
+                this.uiService.presentToast("Please Enter Valid Email");
+                return false;
+            }
+            if(!passwordValid){
+                this.uiService.presentToast("Password should be 6 characters long");
+                return false;
+            }
+            if(this.passwordText != this.passwordConfrimText){
+                this.uiService.presentToast("Password and Confirm password should match");
+                return false;
+            }
+        return true;
+    }
+    private navigateLogInPage() {
         this.navCtrl.navigateRoot("login",{animated: true})
     }
     private navigateToMainPage(){
-        this.navCtrl.navigateRoot("main/vendors-list",{animated: true});
+        this.navCtrl.navigateRoot("",{animated: true});
     }
     private navigateToLandingPage(){
-        this.navCtrl.navigateRoot("",{animated: true})
+        this.navCtrl.navigateRoot("welcome",{animated: true})
     }
 
 }

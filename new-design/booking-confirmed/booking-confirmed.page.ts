@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-booking-confirmed',
@@ -8,7 +9,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class BookingConfirmedPage implements OnInit {
   orderId:string = ''
-  constructor(private router:Router,private route: ActivatedRoute) { }
+  constructor(private router:Router,
+    private route: ActivatedRoute,
+    private navCtrl: NavController) { }
   ngOnInit(){}
   ionViewWillEnter() {
     this.route.queryParams.subscribe(async (params) => {
@@ -17,8 +20,8 @@ export class BookingConfirmedPage implements OnInit {
     });
   }
   navigateToMyBookings(){
-    this.router.navigate(['main/','booking']) //['home/','tab3']
-    //main/booking
+    this.navCtrl.navigateRoot('bookings', { animated: true });
+
   }
 
 }

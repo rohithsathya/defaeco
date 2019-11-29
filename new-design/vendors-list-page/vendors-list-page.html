@@ -32,35 +32,57 @@
 </ion-header>
 
 <ion-content>
+    <!-- data screen -->
+    <div *ngIf="!isLoading">
+        <ion-list>
+            <ion-item class="ion-activatable" *ngFor="let vendor of vendorsList" (click)="goToVendorDetails(vendor)">
+                <ion-label>
+                    <h2>{{vendor.name}}</h2>
+                    <h3>{{vendor.areaNames.toString()}}</h3>
+                    <p>{{vendor.services}}</p>
+                </ion-label>
+                <ion-chip outline="true" [color]="getRatingColor(vendor.rating)">
+                    <ion-label>{{vendor.rating.toFixed(1)}}</ion-label>
+                    <ion-icon name="star"></ion-icon>
+                </ion-chip>
+                <ion-ripple-effect></ion-ripple-effect>
+            </ion-item>
+    
+    
+        </ion-list>
+        <ion-label *ngIf="!location">
+            <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">Please Select your location to continue...
+            </h2>
+        </ion-label>
+        <ion-label *ngIf="location && vendorsList && vendorsList.length <=0">
+            <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">No Vendors Found, for selected Location.
+            </h2>
+        </ion-label>
+    </div>
 
-
-
-    <ion-list>
-        <ion-item class="ion-activatable" *ngFor="let vendor of vendorsList" (click)="goToVendorDetails(vendor)">
-            <ion-label>
-                <h2>{{vendor.name}}</h2>
-                <h3>{{vendor.areaNames.toString()}}</h3>
-                <p>{{vendor.services}}</p>
-            </ion-label>
-            <ion-chip outline="true" [color]="getRatingColor(vendor.rating)">
-                <ion-label>{{vendor.rating.toFixed(1)}}</ion-label>
-                <ion-icon name="star"></ion-icon>
-            </ion-chip>
-            <ion-ripple-effect></ion-ripple-effect>
-        </ion-item>
-
-
-    </ion-list>
-
-    <ion-label *ngIf="!location">
-        <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">Please Select your location to continue...
-        </h2>
-    </ion-label>
-
-    <ion-label *ngIf="location && vendorsList && vendorsList.length <=0">
-        <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">No Vendors Found, for selected Location.
-        </h2>
-    </ion-label>
-
+    <!-- Skeleton screen -->
+    <div *ngIf="isLoading">
+        <ion-list>
+            <ion-list-header>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+            </ion-list-header>
+            <ion-item *ngFor="let i of skeletonElements">
+                <ion-thumbnail slot="start">
+                    <ion-skeleton-text animated></ion-skeleton-text>
+                </ion-thumbnail>
+                <ion-label>
+                    <h3>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </h3>
+                    <p>
+                        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                    </p>
+                    <p>
+                        <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                    </p>
+                </ion-label>
+            </ion-item>
+        </ion-list>
+    </div>
 
 </ion-content>

@@ -1,12 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AppLocationSelectionComponent } from '../location-selection-component/location-selection-component';
-import { PopoverController, ModalController, NavController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { ModalController, NavController } from '@ionic/angular';
 import { DataService } from '../services/data.service';
-import { Router, NavigationExtras } from '@angular/router';
 import { AppLocationSelectionPage } from '../location-selection-page/location-selection-page';
-import { Subscription } from 'rxjs';
 import { VendorDataService } from '../services/vendors.data.service';
-import { LoginService } from '../services/login.service';
 import { DefaecoVendor } from '../services/interfaces/DefaecoVendor';
 import { AuthenticationService, User } from '../services/authentication.service';
 
@@ -15,7 +11,7 @@ import { AuthenticationService, User } from '../services/authentication.service'
   templateUrl: 'vendors-list-page.html',
   styleUrls: ['vendors-list-page.scss']
 })
-export class AppVendorsListPagePage implements OnInit, OnDestroy {
+export class AppVendorsListPagePage implements OnInit {
 
   vendorsList: DefaecoVendor[] = [];
   vendorsListMaster: DefaecoVendor[] = [];
@@ -23,74 +19,42 @@ export class AppVendorsListPagePage implements OnInit, OnDestroy {
   user:User;
   location;
   locationText;
-  vendorListSubscription: Subscription;
-  constructor(public popoverController: PopoverController, public dataService: DataService, private router: Router, public modalController: ModalController, public vendorService: VendorDataService, private loginService: LoginService,private authService:AuthenticationService,private navCtrl: NavController) { }
+  skeletonElements:any[] = Array(10);
+  isLoading:boolean = false;
+  constructor(private dataService: DataService, 
+    private modalController: ModalController, 
+    private vendorService: VendorDataService,
+    private authService:AuthenticationService,
+    private navCtrl: NavController) { }
+  
   ngOnInit(){}
-
-  ionViewCanEnter(){
-    console.log("Can Enter");
-  }
-  ionViewCanLeave(){
-    console.log("Can Leave");
-  }
-
-
-  async ionViewWillEnter() {
-    let busySpinner: any;
-    try {
-
-      busySpinner = await this.dataService.presentBusySpinner();
-      this.user = await this.authService.getVerifiedLoginUser();
-     
-      if (this.user) {
-        this.init();
-      } else {
-        this.navigateToWelcomePage();
-      }
-      await busySpinner.dismiss();
-    } catch (e) {
-      console.error(e);
-      await busySpinner.dismiss();
+  ionViewWillEnter() {
+    this.user = this.authService.getCurrentUser();
+    if (this.user) {
+      this.init();
+    }else{
+      this.navigateToWelcomePage();
     }
   }
   async init() {
-    //temp
-    //await this.vendorService.saveVendor();
-
-
-
-    //if location is not set open the loc set popup
-    let busySpinner: any = await this.dataService.presentBusySpinner();
-    this.location = await this.dataService.getLocation();
-    await busySpinner.dismiss();
-
-    if (!this.location) {
-      this.showLocationSelectionModal();
-    } else {
-      this.getVendorList();
-    }
-  }
-  ngOnDestroy() {
-    if (this.vendorListSubscription) {
-      this.vendorListSubscription.unsubscribe();
-    }
-  }
-  async getVendorList() {
-    let busySpinner;
     try {
-
-      busySpinner = await this.dataService.presentBusySpinner();
-      this.vendorsListMaster = await this.vendorService.getVendorList(this.location.name) as DefaecoVendor[];
-      this.vendorsList = this.vendorsListMaster.map((d) => {
-        return d;
-      })
-      await busySpinner.dismiss();
-
+      //if location is not set open the loc set popup
+      this.isLoading = true;
+      this.location = await this.dataService.getLocation();
+      if (!this.location) {
+        this.isLoading = false;
+        this.showLocationSelectionModal();
+      } else {
+        this.vendorsListMaster = await this.vendorService.getVendorList(this.location.name) as DefaecoVendor[];
+        this.vendorsList = this.vendorsListMaster.map((d) => {
+          return d;
+        });
+        this.isLoading = false;
+      }
     } catch (e) {
-      console.error(e);
-      await busySpinner.dismiss();
+      console.log("Error>>>vendors-list-page.ts>>>init()");
+      this.isLoading = false;
     }
-
   }
   getRatingColor(rating) {
 
@@ -135,35 +99,19 @@ export class AppVendorsListPagePage implements OnInit, OnDestroy {
     //this.sortVendorListBasedOnRanking()
 
   }
-  // sortVendorListBasedOnRanking() {
-  //   this.vendorsList.sort((a, b) => {
-  //     return b.ranking - a.ranking;
-  //   })
-  // }
   goToVendorDetails(vendor:DefaecoVendor) {
     this.vendorService.setCurrentVendor(vendor);
-
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-          "vendorId": vendor.id
-      }
-    };
-
-
-    this.router.navigate(['/', 'vendor-detail'],navigationExtras);
-    //vendor-detail
+    this.navCtrl.navigateForward(`vendor-detail?vendorId=${encodeURI(vendor.id)}`);
   }
   async changeLocationClick() {
     await this.showLocationSelectionModal();
   }
-
   async showLocationSelectionModal() {
     const modal = await this.modalController.create({
       component: AppLocationSelectionPage
     });
     await modal.present();
     await modal.onWillDismiss();
-    //this.getVendorList();
     this.init();
   }
   navigateToWelcomePage(){

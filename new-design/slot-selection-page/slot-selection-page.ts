@@ -5,6 +5,8 @@ import { DefaecoVendor, DefaecoVendorPackageAddons, DefaecoVendorPackage } from 
 import { SlotService, DefaecoSlot } from '../services/slot.service';
 import { AlertController, NavController } from '@ionic/angular';
 import { DataService } from '../services/data.service';
+import { AuthenticationService, User } from '../services/authentication.service';
+import { UiService } from '../services/ui.service';
 
 @Component({
     selector: 'app-slot-selection-page',
@@ -28,42 +30,66 @@ export class AppSlotSelectionPage implements OnInit {
     selectedData:any = new Date().toDateString();
     userPickedTime:any = new Date();
     selectedSlot:any = {};
-
-    constructor(private router: Router, private vendorService:VendorDataService,private route: ActivatedRoute,private slotService:SlotService,public alertController: AlertController,private dataService: DataService,private navCtrl: NavController) { }
+    user:User;
+    isLoading:boolean = false;
+    constructor(private router: Router, 
+        private vendorService:VendorDataService,
+        private route: ActivatedRoute,
+        private slotService:SlotService,
+        public alertController: AlertController,
+        private dataService: DataService,
+        private navCtrl: NavController,
+        private authService:AuthenticationService,
+        private uiService: UiService
+        ) { }
     ngOnInit(){}
     ionViewWillEnter(){
+        this.user = this.authService.getCurrentUser();
+        if (this.user) {
+            this.init();
+        } else {
+            this.navigateToWelcomePage();
+        }
+
+        
+    }
+    init(){
 
         this.route.queryParams.subscribe(async (params) => {
-            this.vendorId = params["vendorId"];
-            this.selectedPackageId = params["selectedPackage"];
-            this.selectedAddonIds = params["addons"];
-            if(this.vendorId){
-
-                let busySpinner:any = await this.dataService.presentBusySpinner();
-                this.vendor =  await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
-                await busySpinner.dismiss();
-
-                this.parseVendorAndGetAddons();
-                //this.selectedPackage.type: "Basic" "Premium"
-                this.isPremium = this.selectedPackage.type =="Premium" ? true:false;
-                this.grandTotal = this.selectedPackage.price;
-                this.totalSlotsRequired = this.selectedPackage.noOfSlotsNeeded;
-                for(let i=0;i<this.selectedPackage.addOns.length;i++){
-                    let currentAddOn = this.selectedPackage.addOns[i];
-                    if(this.selectedAddonIds.indexOf(currentAddOn.code) >=0){
-                        this.grandTotal = this.grandTotal + currentAddOn.price;
-                        this.totalSlotsRequired = this.totalSlotsRequired + currentAddOn.noOfSlotsNeeded;
-                    }
+            try{
+                this.isLoading = true;
+                this.vendorId = params["vendorId"];
+                this.selectedPackageId = params["selectedPackage"];
+                this.selectedAddonIds = params["addons"];
+                if(this.vendorId){
+                    this.vendor =  await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
+                    this.parseVendorAndGetAddons();
+                    //this.selectedPackage.type: "Basic" "Premium"
+                    this.isPremium = this.selectedPackage.type =="Premium" ? true:false;
+                    this.grandTotal = this.selectedPackage.price;
+                    this.totalSlotsRequired = this.selectedPackage.noOfSlotsNeeded;
+                    for(let i=0;i<this.selectedPackage.addOns.length;i++){
+                        let currentAddOn = this.selectedPackage.addOns[i];
+                        if(this.selectedAddonIds.indexOf(currentAddOn.code) >=0){
+                            this.grandTotal = this.grandTotal + currentAddOn.price;
+                            this.totalSlotsRequired = this.totalSlotsRequired + currentAddOn.noOfSlotsNeeded;
+                        }
+                    }             
+                    await this.showAvailableSlots(this.userPickedTime,this.totalSlotsRequired);
+                    this.isLoading=false;
                 }
-                let busySpinner1:any = await this.dataService.presentBusySpinner();                
-                await this.showAvailableSlots(this.userPickedTime,this.totalSlotsRequired);
-                await busySpinner1.dismiss();
+                else{
+                    this.isLoading=false;
+                    //if vendor is not present go to listing page
+                    this.gobackToListingPage();
+                }
+
+            }catch(e){
+                this.isLoading = false;
+                console.log("Error",e)
             }
-            else{
-                //if vendor is not present go to listing page
-                this.gobackToListingPage();
-              }
         }); 
+
     }
     parseVendorAndGetAddons(){
         for(let i=0;i<this.vendor.packageMatrix.length;i++){
@@ -170,19 +196,13 @@ export class AppSlotSelectionPage implements OnInit {
 
     async dateChange(event){
         this.userPickedTime = new Date(event.target.value);
-        let busySpinner:any = await this.dataService.presentBusySpinner();                
+        let busySpinner:any = await this.uiService.presentBusySpinner();                
         await this.showAvailableSlots(this.userPickedTime,this.totalSlotsRequired);
         await busySpinner.dismiss();
     }
     navigateToAddonPage(){
+        this.navCtrl.navigateForward(`add-options?vendorId=${encodeURI(this.vendor.id)}&selectedPackage=${encodeURI(this.selectedPackage.code)}&addons=${encodeURI(this.selectedAddonIds.toString())}`, { animated: true });
 
-        let navigationExtras: NavigationExtras = {
-            queryParams: {
-                "vendorId": this.vendor.id,
-                "selectedPackage":this.selectedPackage.code
-            }
-          };
-        this.router.navigate(['/', 'add-options'],navigationExtras); //main
 
     }
     gobackToListingPage() {
@@ -190,9 +210,12 @@ export class AppSlotSelectionPage implements OnInit {
     }
     
     proceedClick(){
-        
         this.dataService.setCurrentOrderSumaryObj(this.vendor,this.selectedPackage,this.selectedAddonIds,this.selectedSlot,this.userPickedTime);
-        this.router.navigate(['/', 'order-summary']); 
+        //this.router.navigate(['/', 'order-summary']); 
+        this.navCtrl.navigateForward('order-summary', { animated: true });
     }
+    navigateToWelcomePage(){
+        this.navCtrl.navigateRoot('welcome', { animated: true });
+      }
 
 }

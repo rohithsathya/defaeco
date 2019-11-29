@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { PopoverController, ModalController, NavController } from '@ionic/angular';
+import {  ModalController } from '@ionic/angular';
 import { DataService } from '../services/data.service';
 import { AreaDataService } from '../services/area.data.service';
-import { DefaecoUserProfile, LoginService } from '../services/login.service';
+import { DefaecoUserProfile } from '../services/login.service';
 import { UiService } from '../services/ui.service';
 
 @Component({
@@ -22,18 +21,24 @@ export class AppLocationSelectionPage implements OnInit {
     userSelectedArea:string ='';
     userProfile: DefaecoUserProfile = new DefaecoUserProfile();
     user:any;
+    isLoading:boolean = false;
+    skeletonElements:any[] = Array(3);
 
     constructor(public dataService:DataService,public modalController: ModalController,public areaService:AreaDataService,private uiService:UiService) { }
     ngOnInit(){}
     async ionViewWillEnter(){
-        let busySpinner: any = await this.uiService.presentBusySpinner();
-        //this.user = await this.loginService.getLoggedInUser();
-        this.selArea = '';
-        this.userSelectedArea = '';
-        this.allAreaList = await this.areaService.getAreaList();
-        this.recentLocationList = this.allAreaList.slice(0, 3);
-        //await this.getUsersPublicProfile();
-        await busySpinner.dismiss();
+        try{
+            this.isLoading = true;
+            this.selArea = '';
+            this.userSelectedArea = '';
+            this.allAreaList = await this.areaService.getAreaList();
+            this.recentLocationList = this.allAreaList.slice(0, 3);
+            this.isLoading = false;
+        }catch(e){
+            console.log("Error",e);
+            this.isLoading = false;
+        }
+        
     }
     filterAreas(event){
         
@@ -71,48 +76,18 @@ export class AppLocationSelectionPage implements OnInit {
     async confirmClick(){
         let busySpinner: any = await this.uiService.presentBusySpinner();
         try{
-            //await this.loginService.savePublicProfile(this.user.uid,this.userProfile);
             this.dataService.setLocation(this.userSelectedArea);
-            this.closeClick();
             await busySpinner.dismiss();
+            this.closeClick();
         }catch(e){
             console.log("ERROR!!!",e);
             await busySpinner.dismiss();
-
-        }
-        
-      
-        
+        }   
     }
     closeClick(){
         if(this.modalController){
             this.modalController.dismiss();
         }
     }
-   
-   
-    // async getUsersPublicProfile() {
-    //     return new Promise(async (resolve, reject) => {
-
-    //         try {
-    //             let busySpinner: any = await this.dataService.presentBusySpinner();
-    //             let userProfile: DefaecoUserProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
-    //             if (userProfile) {
-    //                 this.userProfile = userProfile;
-    //             }
-    //             await busySpinner.dismiss();
-    //             resolve()
-    //         } catch (e) {
-    //             console.log("ERROR!!!", e);
-    //             reject()
-    //         }
-
-    //     })
-
-
-
-    // }
-
-
 
 }

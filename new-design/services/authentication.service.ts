@@ -63,19 +63,6 @@ export class AuthenticationService {
             this.user['accountVerified'] = accountVerified;
         }
     }
-    async logoutUser(){
-        return new Promise(async(resolve,reject)=>{
-            try{
-                await firebase.auth().signOut();
-                this.user = null;
-                resolve();
-            }catch(e){
-                console.log("ERROR!!!",e);
-                reject(e);
-            }
-        })
-       
-    }
 
 
     constructor(private afAuth: AngularFireAuth) {}
@@ -130,23 +117,76 @@ export class AuthenticationService {
 
         
     }
-    logOutUser() {
 
-        return new Promise((resolve, reject) => {
-    
-          firebase.auth().signOut()
-            .then(() => {
-              console.log("LOG Out");
-              resolve();
-            }).catch((error) => {
-              reject();
-            });
-    
+    //new methods
+    private new_updateUserWithEmailVerification(user:User) {
+        if (user) {
+            let accountVerified = true;
+            for (let i = 0; i < user.providerData.length; i++) {
+                let provider = user.providerData[i];
+                if (provider && provider.providerId == "password") {
+                    accountVerified = user.emailVerified;
+                    break;
+                }
+            }
+            user.accountVerified = accountVerified;
+        }
+        return user;
+    }
+    loginWithEmail(email,password):Promise<any> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL); //https://firebase.google.com/docs/auth/web/auth-state-persistence
+                await this.afAuth.auth.signInWithEmailAndPassword(email, password);
+                await this.setupUser();
+                resolve()
+            } catch (e) {
+                console.log("Error>>>>authentication.service.ts>>>loginWithEmail", e);
+                reject(e);
+            }
+
         })
-    
-    
-    
-      }
+    }
+    signUpWithEmail(email,password):Promise<any>{
+        return this.afAuth.auth.createUserWithEmailAndPassword(email,password)
+    }
+    //should be called only once when app opens or on success
+    setupUser(){
+        return new Promise((resolve, reject) => {
+            try{
+                firebase.auth().onAuthStateChanged((user:any) => {
+                        if(user){
+                            let updatedUser:User =  this.new_updateUserWithEmailVerification(user);
+                            this.user = updatedUser.accountVerified?updatedUser:null;
+                        }else{
+                            this.user = null; 
+                        }
+                        resolve(this.user);
+                    });
+            }catch(e){
+                console.log("ERROR!!!",e);
+                reject(e);
+            }
+        });
+
+    }
+    getCurrentUser():User{
+        return this.user;
+    }
+    async logoutUser(){
+        return new Promise(async(resolve,reject)=>{
+            try{
+                await firebase.auth().signOut();
+                this.user = null;
+                resolve();
+            }catch(e){
+                console.log("ERROR!!!",e);
+                reject(e);
+            }
+        })
+       
+    }
+
     
 
 
