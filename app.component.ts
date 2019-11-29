@@ -29,10 +29,14 @@ export class AppComponent {
   }
   private navigateToMainPage() {
     this.menuCtrl.close("mainMenu");
-    this.navCtrl.navigateRoot("main/vendors-list", { animated: true });
+    this.navCtrl.navigateRoot("", { animated: true });
   }
   private navigateToAccountPage(){
     this.menuCtrl.close("mainMenu");
-    this.navCtrl.navigateRoot("main/account", { animated: true });
+    this.navCtrl.navigateRoot("profile", { animated: true });
+  }
+  private navigateToBookingPage(){
+    this.menuCtrl.close("mainMenu");
+    this.navCtrl.navigateRoot("bookings", { animated: true });
   }
 }

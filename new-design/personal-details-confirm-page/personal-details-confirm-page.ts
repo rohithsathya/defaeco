@@ -4,6 +4,7 @@ import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor } from '../services/interfaces/DefaecoVendor';
 import { LoginService, DefaecoUserProfile } from '../services/login.service';
 import { DataService } from '../services/data.service';
+import { NavController } from '@ionic/angular';
 
 @Component({
     selector: 'app-personal-details-confirm-page',
@@ -17,7 +18,7 @@ export class AppPersonalDetailConfirmPage implements OnInit {
     vendor: DefaecoVendor;
     user: any;
     userProfile: DefaecoUserProfile = new DefaecoUserProfile();
-    constructor(private router: Router, private vendorService: VendorDataService, private route: ActivatedRoute, private loginService: LoginService, private dataService: DataService) { }
+    constructor(private router: Router, private vendorService: VendorDataService, private route: ActivatedRoute, private loginService: LoginService, private dataService: DataService,private navCtrl: NavController) { }
     ngOnInit(){}
     ionViewWillEnter() {
         this.route.queryParams.subscribe(async (params) => {
@@ -27,7 +28,7 @@ export class AppPersonalDetailConfirmPage implements OnInit {
                 this.vendor = await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
                 this.user = await this.loginService.checkIfAccountIsVerified();
                 if (this.user) {
-                    this.init();
+                    this.userProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
                 } else {
                     this.dataService.navigateToLoginPage();
                 }
@@ -40,11 +41,6 @@ export class AppPersonalDetailConfirmPage implements OnInit {
 
 
         });
-    }
-    async init() {
-        let busySpinner: any = await this.dataService.presentBusySpinner();
-        this.userProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
-        await busySpinner.dismiss();
     }
 
     async proceedClick() {
@@ -61,8 +57,16 @@ export class AppPersonalDetailConfirmPage implements OnInit {
             this.router.navigate(['/', 'pack-sel'], navigationExtras); //main
         }
     }
+    navigateToVendorsDetailsPage(){
+        let navigationExtras: NavigationExtras = {
+            queryParams: {
+                "vendorId": this.vendor.id
+            }
+        };
+        this.router.navigate(['/', 'vendor-detail'], navigationExtras); //main
+    }
     gobackToListingPage() {
-        this.router.navigate(['/main', 'vendors-list']); //main
+        this.navCtrl.navigateRoot('', { animated: true });
     }
 
 }

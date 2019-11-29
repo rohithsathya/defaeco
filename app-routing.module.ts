@@ -22,24 +22,24 @@ import { DefaecoWelcomePageComponent } from './production/components/welcome-pag
 
 const routes: Routes = [
 
-  { path: 'main', component: AppMainPage,
-    children: [
-      {
-        path: 'booking',
-        component: AppMyBookingPage
-      },
-      {
-        path: 'vendors-list',
-        component: AppVendorsListPagePage
-      },
-      {
-        path: 'account',
-        component: AppAccountPage
-      }
-    ]
-  },
+  // { path: 'main', component: AppMainPage,
+  //   children: [
+  //     {
+  //       path: 'booking',
+  //       component: AppMyBookingPage
+  //     },
+  //     {
+  //       path: 'vendors-list',
+  //       component: AppVendorsListPagePage
+  //     },
+  //     {
+  //       path: 'account',
+  //       component: AppAccountPage
+  //     }
+  //   ]
+  // },
+  { path: 'welcome', component: LandingPage },
   { path: 'booking-confirmed', component: BookingConfirmedPage },
-  { path: '', component: LandingPage },
   { path: 'login', component: AppLogInPage },
   { path: 'sign-up', component: SignUpPage },
   { path: 'loc-sel', component: AppLocationSelectionPage },
@@ -53,7 +53,13 @@ const routes: Routes = [
   { path: 'booking-detail', component: AppBookingDetailsPage },
   { path: 'booking', component: AppMyBookingPage },
   { path: 'edit-profile', component:EditPersonalDetailsPage},
-  { path: 'payment', loadChildren: './payment/payment.module#PaymentPageModule' },
+
+  //{ path: 'vendors', component:AppVendorsListPagePage},
+  { path: '', component:AppVendorsListPagePage},
+  { path: 'bookings', component:AppMyBookingPage},
+  { path: 'profile', component:AppAccountPage},
+
+  //{ path: 'payment', loadChildren: './payment/payment.module#PaymentPageModule' },
 
   //production
   {path: 'd-welcome',component:DefaecoWelcomePageComponent}

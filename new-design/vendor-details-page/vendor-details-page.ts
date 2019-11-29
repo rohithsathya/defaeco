@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor } from '../services/interfaces/DefaecoVendor';
+import { UiService } from '../services/ui.service';
+import { NavController } from '@ionic/angular';
 
 @Component({
     selector: 'app-vendor-details-page',
@@ -17,7 +19,7 @@ export class AppVendorDetailsPage implements OnInit {
     vendor:DefaecoVendor = new DefaecoVendor();
     vendorId:string;
       
-    constructor(private router: Router,private vendorService:VendorDataService,private route: ActivatedRoute) { }
+    constructor(private router: Router,private vendorService:VendorDataService,private route: ActivatedRoute,private uiService:UiService,private navCtrl: NavController) { }
     ngOnInit(){}
     ionViewWillEnter(){
         this.route.queryParams.subscribe(async (params) => {
@@ -27,7 +29,7 @@ export class AppVendorDetailsPage implements OnInit {
             }
             else{
                 //if vendor is not present go to listing page
-                this.gobackToListingPage();
+                this.navigateToVendorsPage();
               }
 
 
@@ -45,15 +47,18 @@ export class AppVendorDetailsPage implements OnInit {
         }
         return timeStr;
     }
-    gobackToListingPage(){
-        this.router.navigate(['/main', 'vendors-list']); //main
+    navigateToVendorsPage(){
+        this.navCtrl.navigateRoot('', { animated: true });
     }
+    
     bookServiceClick(){
         let navigationExtras: NavigationExtras = {
             queryParams: {
                 "vendorId": this.vendor.id
             }
           };
+        //this.navCtrl.navigateRoot(`vendors?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
+        
         this.router.navigate(['/', 'confirm-personal-details'],navigationExtras); //main
     }
 

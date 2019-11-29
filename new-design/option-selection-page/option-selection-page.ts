@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor, DefaecoVendorPackageAddons, DefaecoVendorPackage } from '../services/interfaces/DefaecoVendor';
+import { NavController } from '@ionic/angular';
 
 @Component({
     selector: 'app-option-selection-page',
@@ -26,7 +27,7 @@ export class AppOptionSelectionPage implements OnInit {
     selectedAddOns:string[] = [];
     grandTotal:number = 0;
     selectedAddonIds:string[] = [];
-    constructor(private router: Router, private vendorService:VendorDataService,private route: ActivatedRoute) { }
+    constructor(private router: Router, private vendorService:VendorDataService,private route: ActivatedRoute,private navCtrl: NavController) { }
     ngOnInit(){}
     ionViewWillEnter(){
         this.route.queryParams.subscribe(async (params) => {
@@ -71,7 +72,15 @@ export class AppOptionSelectionPage implements OnInit {
 
     }
     gobackToListingPage() {
-        this.router.navigate(['/main', 'vendors-list']); //main
+        this.navCtrl.navigateRoot('', { animated: true });
+    }
+    navigateToPackSelPage(){
+        let navigationExtras: NavigationExtras = {
+            queryParams: {
+                "vendorId": this.vendor.id
+            }
+          };
+        this.router.navigate(['/', 'pack-sel'],navigationExtras);
     }
     proceedClick(){
         let navigationExtras: NavigationExtras = {

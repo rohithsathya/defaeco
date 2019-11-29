@@ -1,57 +1,41 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from '../services/data.service';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { Router } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { LoginService } from '../services/login.service';
+import { AuthenticationService, User } from '../services/authentication.service';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-account-page',
   templateUrl: 'account-page.html',
   styleUrls: ['account-page.scss']
 })
-export class AppAccountPage implements OnInit{
+export class AppAccountPage {
 
-  user:any = {};
-  userProfile:any={};
-  constructor(private dataService:DataService,private fireAuth: AngularFireAuth,private router:Router,private fireStore: AngularFirestore,private loginService: LoginService) {}
-  ngOnInit(){}
-  async ionViewWillEnter(){
+  user: User = {};
+  userProfile: any = {};
+  constructor(private dataService: DataService, private fireStore: AngularFirestore, private authService: AuthenticationService, private navCtrl: NavController) { }
+  async ionViewWillEnter() {
     let busySpinner: any = await this.dataService.presentBusySpinner();
-    this.user = await this.loginService.getLoggedInUser();
-    await busySpinner.dismiss();
-    if (this.user && this.user.accountVerified) {
-
-        // console.log("logged in user", this.user);
-        // this.userProfile["displayName"] = this.user.displayName;
-        // this.userProfile["email"] = this.user.email;
-        // this.userProfile["photoURL"] = this.user.photoURL;
-
-        this.getUsersPublicProfile();
-
+    this.user = await this.authService.getVerifiedLoginUser();
+    if (this.user) {
+      this.getUsersPublicProfile();
     } else {
-        this.dataService.navigateToLoginPage();
+      this.navigateToLoginPage();
     }
-
-    // let userVal = await this.dataService.getLoggedInUserFromLocalStorage();
-    // if(userVal){
-    //     this.user = JSON.parse(userVal);
-        
-    // }
+    await busySpinner.dismiss();
   }
-  async signOutClick(){
-    await this.loginService.logoutUser();
-    //await this.fireAuth.auth.signOut();
+  async signOutClick() {
+    await this.authService.logoutUser();
     this.dataService.resetLocation();
     this.dataService.saveLoggedInUser(null);
     this.navigateToLoginPage();
 
   }
-  navigateToLoginPage(){
-    this.router.navigate(['/', 'login']); //main
+  navigateToLoginPage() {
+    this.navCtrl.navigateRoot('login', { animated: true });
   }
-  navigateToEditProfile(){
-    this.router.navigate(['/', 'edit-profile']);
+  navigateToEditProfile() {
+    this.navCtrl.navigateRoot('edit-profile', { animated: true });
   }
   async getUsersPublicProfile() {
     let busySpinner: any = await this.dataService.presentBusySpinner();
@@ -59,11 +43,11 @@ export class AppAccountPage implements OnInit{
     let userProfile = await public_profile_ref.data() //.toPromise();
 
     if (userProfile) {
-        this.userProfile = userProfile;
+      this.userProfile = userProfile;
     }
     await busySpinner.dismiss();
 
 
-}
+  }
 
 }

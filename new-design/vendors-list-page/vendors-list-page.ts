@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppLocationSelectionComponent } from '../location-selection-component/location-selection-component';
-import { PopoverController, ModalController } from '@ionic/angular';
+import { PopoverController, ModalController, NavController } from '@ionic/angular';
 import { DataService } from '../services/data.service';
 import { Router, NavigationExtras } from '@angular/router';
 import { AppLocationSelectionPage } from '../location-selection-page/location-selection-page';
@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 import { VendorDataService } from '../services/vendors.data.service';
 import { LoginService } from '../services/login.service';
 import { DefaecoVendor } from '../services/interfaces/DefaecoVendor';
-import { AuthenticationService } from '../services/authentication.service';
+import { AuthenticationService, User } from '../services/authentication.service';
 
 @Component({
   selector: 'app-vendors-list-page',
@@ -20,11 +20,11 @@ export class AppVendorsListPagePage implements OnInit, OnDestroy {
   vendorsList: DefaecoVendor[] = [];
   vendorsListMaster: DefaecoVendor[] = [];
   searchText: string = '';
-  user;
+  user:User;
   location;
   locationText;
   vendorListSubscription: Subscription;
-  constructor(public popoverController: PopoverController, public dataService: DataService, private router: Router, public modalController: ModalController, public vendorService: VendorDataService, private loginService: LoginService,private authService:AuthenticationService) { }
+  constructor(public popoverController: PopoverController, public dataService: DataService, private router: Router, public modalController: ModalController, public vendorService: VendorDataService, private loginService: LoginService,private authService:AuthenticationService,private navCtrl: NavController) { }
   ngOnInit(){}
 
   ionViewCanEnter(){
@@ -36,20 +36,18 @@ export class AppVendorsListPagePage implements OnInit, OnDestroy {
 
 
   async ionViewWillEnter() {
-    console.log("ion view will enter");
-    let user = await this.authService.getLoggedInUser();
-    console.log("logged in user->>>>>>>>>>>>>>>>>>>>",user);
     let busySpinner: any;
     try {
 
       busySpinner = await this.dataService.presentBusySpinner();
-      let accountVerified: any = await this.checkIfAccountIsVerified();
-      await busySpinner.dismiss();
-      if (accountVerified) {
+      this.user = await this.authService.getVerifiedLoginUser();
+     
+      if (this.user) {
         this.init();
       } else {
-        this.dataService.navigateToLoginPage();
+        this.navigateToWelcomePage();
       }
+      await busySpinner.dismiss();
     } catch (e) {
       console.error(e);
       await busySpinner.dismiss();
@@ -71,19 +69,6 @@ export class AppVendorsListPagePage implements OnInit, OnDestroy {
     } else {
       this.getVendorList();
     }
-  }
-  async checkIfAccountIsVerified() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        this.user = await this.loginService.getLoggedInUser();
-        let accountVerified = this.user && this.user.accountVerified ? true : false;
-        resolve(accountVerified);
-
-      } catch (e) {
-        console.error(e);
-        resolve(false);
-      }
-    })
   }
   ngOnDestroy() {
     if (this.vendorListSubscription) {
@@ -180,6 +165,9 @@ export class AppVendorsListPagePage implements OnInit, OnDestroy {
     await modal.onWillDismiss();
     //this.getVendorList();
     this.init();
+  }
+  navigateToWelcomePage(){
+    this.navCtrl.navigateRoot('welcome', { animated: true });
   }
 
 

@@ -42,10 +42,10 @@ export class AppLogInPage implements OnInit{
         //this.handleUserLogIn();
     }
     private navigateToMainPage(){
-        this.navCtrl.navigateRoot("main/vendors-list",{animated: true});
+        this.navCtrl.navigateRoot("",{animated: true});
     }
     private navigateToLandingPage(){
-        this.navCtrl.navigateRoot("",{animated: true})
+        this.navCtrl.navigateRoot("welcome",{animated: true})
     }
     private navigateToSignUpPage() {
         this.navCtrl.navigateRoot('sign-up',{animated: true});

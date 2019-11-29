@@ -2,9 +2,11 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
 import { DataService } from '../services/data.service';
 import { LoginService } from '../services/login.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { OrderService, DefaecoOrder, DefaecoOrderStatus } from '../services/order.service';
+import { AuthenticationService, User } from '../services/authentication.service';
+import { UiService } from '../services/ui.service';
 
 @Component({
   selector: 'app-booking-details',
@@ -17,34 +19,35 @@ export class AppBookingDetailsPage implements OnInit {
   orderStatusLable = '';
   orderStausColor='success';
   isOrderActive:boolean = false;
-  user: any;
+  user: User;
   bookedForDate: Date = new Date();
   bookedForNextDate: Date = new Date();
   bookedOnDate: Date = new Date();
   cutOffTime:number = 86400000; //24 hours in milliseconds
-  constructor(private route: ActivatedRoute, private changeDetector: ChangeDetectorRef, private router: Router, private dataService: DataService, private loginService: LoginService, public alertController: AlertController, private afs: AngularFirestore,private orderService:OrderService) {
+  constructor(private dataService: DataService,public alertController: AlertController, private afs: AngularFirestore,private orderService:OrderService,private authService: AuthenticationService, private navCtrl: NavController,private uiService:UiService) {
 
-    // this.route.params.subscribe((data) => {
-    //   this.ngOnInit();
-    //   //this.changeDetector.detectChanges();
-    // })
   }
   ngOnInit(){}
   async ionViewWillEnter() {
     let busySpinner: any;
     try {
-      busySpinner = await this.dataService.presentBusySpinner();
-      let accountVerified: any = await this.checkIfAccountIsVerified();
-      await busySpinner.dismiss();
-      if (accountVerified) {
+      busySpinner = await this.uiService.presentBusySpinner();
+      this.user = await this.authService.getVerifiedLoginUser();
+      
+      if (this.user) {
         this.init();
       } else {
-        this.dataService.navigateToLoginPage();
+        this.navigateToLoginPage();
       }
+
+      await busySpinner.dismiss();
     } catch (e) {
       console.error(e);
       await busySpinner.dismiss();
     }
+  }
+  navigateToLoginPage(){
+    this.navCtrl.navigateRoot('login', { animated: true });
   }
   init() {
     this.order = this.dataService.getSelectedOrder();
@@ -73,19 +76,6 @@ export class AppBookingDetailsPage implements OnInit {
       this.orderStausColor = 'secondary';
       this.isOrderActive = false;
     }
-  }
-  async checkIfAccountIsVerified() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        this.user = await this.loginService.getLoggedInUser();
-        let accountVerified = this.user && this.user.accountVerified ? true : false;
-        resolve(accountVerified);
-
-      } catch (e) {
-        console.error(e);
-        resolve(false);
-      }
-    })
   }
   async cantCancelForPastDate() {
     const alert = await this.alertController.create({
@@ -204,18 +194,18 @@ export class AppBookingDetailsPage implements OnInit {
   }
 
   async forceCancelOrder(isrefund) {
-    let busySpinner:any = await this.dataService.presentBusySpinner();
+    let busySpinner:any = await this.uiService.presentBusySpinner();
     try {
 
       await this.orderService.cancelOrder(this.order.id,isrefund);
       this.reopenTheSlots();
       busySpinner.dismiss();
-      this.dataService.presentToast("Order Canceled successfully");
+      this.uiService.presentToast("Order Canceled successfully");
       this.navigateToBookingsPage();
 
     } catch (e) {
       console.log("ERROR!!!", e);
-      this.dataService.presentToast("Error Cancelling Order");
+      this.uiService.presentToast("Error Cancelling Order");
       busySpinner.dismiss();
     }
   }
@@ -228,7 +218,7 @@ export class AppBookingDetailsPage implements OnInit {
     }
   }
   navigateToBookingsPage() {
-    this.router.navigate(['/main', 'booking']);
+    this.navCtrl.navigateRoot('bookings', { animated: true });
   }
   navigateToSlotReschdulePage() {
     let navigationExtras: NavigationExtras = {
@@ -239,7 +229,7 @@ export class AppBookingDetailsPage implements OnInit {
           "orderId":this.order.id
       }
     };
-    this.router.navigate(['/', 'reschdule-slot'],navigationExtras);
+    this.navCtrl.navigateRoot('reschdule-slot', { animated: true });
   }
 
 }

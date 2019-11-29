@@ -1,7 +1,9 @@
 <ion-header>
-    <ion-toolbar color="primary">
+    <ion-toolbar color="dark">
         <ion-buttons slot="start">
-            <ion-back-button></ion-back-button>
+                <ion-button (click)="navigateToVendorsDetailsPage()">
+                    <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+                </ion-button>
         </ion-buttons>
         <ion-title>
             Confirm Details
@@ -12,21 +14,15 @@
 <ion-content>
 
     <ion-list>
-        <!-- <ion-item>
-                <ion-label>
-                    <h5>Name</h5>
-                    <p>{{userProfile.displayName}}</p>
-                </ion-label>
-            </ion-item> -->
-        <ion-item>
+        <ion-item style="margin-bottom: 16px;">
             <ion-label position="floating">Name</ion-label>
             <ion-input type="text" [(ngModel)]="userProfile.displayName"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item style="margin-bottom: 16px;">
             <ion-label position="floating">Phone Number</ion-label>
             <ion-input type="text" [(ngModel)]="userProfile.phoneNumber"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item style="margin-bottom: 16px;">
             <ion-label>Vehicle Type</ion-label>
             <ion-select [(ngModel)]="userProfile.vehicleType">
                 <ion-select-option value="hatchback">Hatchback</ion-select-option>
@@ -37,7 +33,7 @@
         </ion-item>
 
 
-        <ion-item>
+        <ion-item style="margin-bottom: 16px;">
             <ion-label position="floating">Vehicle Reg Number</ion-label>
             <ion-input type="text" [(ngModel)]="userProfile.regNo"></ion-input>
         </ion-item>

@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { DataService } from '../services/data.service';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { Router } from '@angular/router';
 import { LoginService, DefaecoUserProfile } from '../services/login.service';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { AngularFireStorage } from '@angular/fire/storage';
-
-import * as firebase from 'firebase'; 
-import { async } from 'q';
+import * as firebase from 'firebase';
+import { User, AuthenticationService } from '../services/authentication.service';
+import { NavController } from '@ionic/angular';
+import { UiService } from '../services/ui.service';
 
 @Component({
     selector: 'app-edit-personal-page',
@@ -16,44 +12,32 @@ import { async } from 'q';
 })
 export class EditPersonalDetailsPage implements OnInit {
 
-    user: any = {};
+    user: User;
     userProfile: DefaecoUserProfile = new DefaecoUserProfile();
     private basePath = '/uploads/dp';
     private uploadTask: firebase.storage.UploadTask;
-    constructor(private dataService: DataService, private fireAuth: AngularFireAuth, private router: Router, private loginService: LoginService, private fireStore: AngularFirestore, private afStorage: AngularFireStorage) { }
+    constructor(private loginService: LoginService,private authService: AuthenticationService, private navCtrl: NavController,private uiService:UiService) { }
     ngOnInit(){}
     async ionViewWillEnter() {
-
-        let busySpinner: any = await this.dataService.presentBusySpinner();
-        this.user = await this.loginService.getLoggedInUser();
-        await busySpinner.dismiss();
-        if (this.user && this.user.accountVerified) {
-
-            console.log("logged in user", this.user);
-            this.userProfile.displayName = this.user.displayName;
-            this.userProfile.email = this.user.email;
-            this.userProfile.photoURL = this.user.photoURL;
-            this.getUsersPublicProfile();
+        let busySpinner: any = await this.uiService.presentBusySpinner();
+        this.user = await this.authService.getVerifiedLoginUser();
+        if (this.user) {
+            let userProfile:DefaecoUserProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
+            if (userProfile) {
+                this.userProfile = userProfile;
+            }
 
         } else {
-            this.dataService.navigateToLoginPage();
-        }
-    }
-
-    async getUsersPublicProfile() {
-        let busySpinner: any = await this.dataService.presentBusySpinner();
-        let userProfile:DefaecoUserProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
-        if (userProfile) {
-            this.userProfile = userProfile;
+            this.navigateToLoginPage();
         }
         await busySpinner.dismiss();
-
-
     }
-
+    private navigateToLoginPage(){
+        this.navCtrl.navigateRoot("login");
+    }
     updateUserPublicProfile() {
         if (!this.userProfile.phoneNumber) {
-            this.dataService.presentToast("Phone number is required, please enter a valid phone number");
+            this.uiService.presentToast("Phone number is required, please enter a valid phone number");
             return;
         }
         this.savePublicProfile();
@@ -61,15 +45,15 @@ export class EditPersonalDetailsPage implements OnInit {
 
     }
     async savePublicProfile() {
-        let busySpinner: any = await this.dataService.presentBusySpinner();
+        let busySpinner: any = await this.uiService.presentBusySpinner();
         await this.loginService.savePublicProfile(this.user.uid,this.userProfile);
         await busySpinner.dismiss();
-        this.dataService.presentToast("Details updated successfully");
+        this.uiService.presentToast("Details updated successfully");
         this.navigateToAccountPage();
 
     }
     async savePublicProfileAfterDP() {
-        let busySpinner: any = await this.dataService.presentBusySpinner();
+        let busySpinner: any = await this.uiService.presentBusySpinner();
         await this.loginService.savePublicProfile(this.user.uid,this.userProfile);
         await busySpinner.dismiss();
 
@@ -79,7 +63,7 @@ export class EditPersonalDetailsPage implements OnInit {
         const file = event.target.files[0];
         const id = Math.random().toString(36).substring(2);
         let storageRef = firebase.storage().ref();
-        let busySpinner: any = await this.dataService.presentBusySpinner();
+        let busySpinner: any = await this.uiService.presentBusySpinner();
         this.uploadTask = storageRef.child(`${this.basePath}/${this.user.uid}`).put(file);
         this.uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
         (snapshot) =>  {
@@ -102,7 +86,7 @@ export class EditPersonalDetailsPage implements OnInit {
         );
     }
     navigateToAccountPage() {
-        this.router.navigate(['/main', 'account']);
+        this.navCtrl.navigateRoot("profile");
     }
 
 }

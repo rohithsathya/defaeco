@@ -86,5 +86,18 @@ export class AppMyBookingPage {
     this.dataService.setSelectedOrder(selectedOrder);
     this.router.navigate(['/', 'booking-detail']);
   } 
+  async doRefresh(event){
+
+    try{
+      this.pendingBookings = await this.orderService.getAllMyActiveOrders() as DefaecoOrder[];
+      this.completedBookings = await this.orderService.getAllMyNonActiveOrders() as DefaecoOrder[];
+      event.target.complete();
+    }catch(e){
+      console.log("Error!!!",e);
+      event.target.complete();
+      this.dataService.presentToast("Some Error occurred");
+    }
+
+  }
 
 }

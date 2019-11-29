@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor, DefaecoVendorPackage } from '../services/interfaces/DefaecoVendor';
+import { NavController } from '@ionic/angular';
 
 @Component({
     selector: 'app-pack-selection-page',
@@ -14,7 +15,7 @@ export class AppPackSelectionPage implements OnInit {
     vendorId:string;
     subTotal:number = 0;
     selectedPackage:DefaecoVendorPackage;
-    constructor(private router: Router, private vendorService:VendorDataService,private route: ActivatedRoute) { }
+    constructor(private router: Router, private vendorService:VendorDataService,private route: ActivatedRoute,private navCtrl: NavController) { }
     ngOnInit(){}
     ionViewWillEnter() {
 
@@ -39,8 +40,17 @@ export class AppPackSelectionPage implements OnInit {
         }
         this.subTotal = this.selectedPackage.price;
     }
+    navigateToPersonalDetailsConfirmationPage(){
+        let navigationExtras: NavigationExtras = {
+            queryParams: {
+                "vendorId": this.vendor.id
+            }
+        };
+        this.router.navigate(['/', 'confirm-personal-details'], navigationExtras); //main
+
+    }
     gobackToListingPage() {
-        this.router.navigate(['/main', 'vendors-list']); //main
+        this.navCtrl.navigateRoot('', { animated: true });
     }
     proceedClick() {
         let navigationExtras: NavigationExtras = {

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { PopoverController, ModalController } from '@ionic/angular';
+import { PopoverController, ModalController, NavController } from '@ionic/angular';
 import { DataService } from '../services/data.service';
 import { AreaDataService } from '../services/area.data.service';
 import { DefaecoUserProfile, LoginService } from '../services/login.service';
+import { UiService } from '../services/ui.service';
 
 @Component({
     selector: 'app-location-selection-page',
@@ -22,16 +23,16 @@ export class AppLocationSelectionPage implements OnInit {
     userProfile: DefaecoUserProfile = new DefaecoUserProfile();
     user:any;
 
-    constructor(public dataService:DataService,public popoverController: PopoverController,private router: Router,public modalController: ModalController,public areaService:AreaDataService,private loginService:LoginService) { }
+    constructor(public dataService:DataService,public modalController: ModalController,public areaService:AreaDataService,private uiService:UiService) { }
     ngOnInit(){}
     async ionViewWillEnter(){
-        let busySpinner: any = await this.dataService.presentBusySpinner();
-        this.user = await this.loginService.getLoggedInUser();
+        let busySpinner: any = await this.uiService.presentBusySpinner();
+        //this.user = await this.loginService.getLoggedInUser();
         this.selArea = '';
         this.userSelectedArea = '';
         this.allAreaList = await this.areaService.getAreaList();
         this.recentLocationList = this.allAreaList.slice(0, 3);
-        await this.getUsersPublicProfile();
+        //await this.getUsersPublicProfile();
         await busySpinner.dismiss();
     }
     filterAreas(event){
@@ -68,10 +69,9 @@ export class AppLocationSelectionPage implements OnInit {
         this.userSelectedArea = ev.target.value;
     }
     async confirmClick(){
-        let busySpinner: any = await this.dataService.presentBusySpinner();
+        let busySpinner: any = await this.uiService.presentBusySpinner();
         try{
-            debugger;
-            await this.loginService.savePublicProfile(this.user.uid,this.userProfile);
+            //await this.loginService.savePublicProfile(this.user.uid,this.userProfile);
             this.dataService.setLocation(this.userSelectedArea);
             this.closeClick();
             await busySpinner.dismiss();
@@ -88,33 +88,30 @@ export class AppLocationSelectionPage implements OnInit {
         if(this.modalController){
             this.modalController.dismiss();
         }
-        this.navigateToMainPage();
     }
    
-    navigateToMainPage() {
-        this.router.navigate(['/', 'main']);
-    }
-    async getUsersPublicProfile() {
-        return new Promise(async (resolve, reject) => {
+   
+    // async getUsersPublicProfile() {
+    //     return new Promise(async (resolve, reject) => {
 
-            try {
-                let busySpinner: any = await this.dataService.presentBusySpinner();
-                let userProfile: DefaecoUserProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
-                if (userProfile) {
-                    this.userProfile = userProfile;
-                }
-                await busySpinner.dismiss();
-                resolve()
-            } catch (e) {
-                console.log("ERROR!!!", e);
-                reject()
-            }
+    //         try {
+    //             let busySpinner: any = await this.dataService.presentBusySpinner();
+    //             let userProfile: DefaecoUserProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
+    //             if (userProfile) {
+    //                 this.userProfile = userProfile;
+    //             }
+    //             await busySpinner.dismiss();
+    //             resolve()
+    //         } catch (e) {
+    //             console.log("ERROR!!!", e);
+    //             reject()
+    //         }
 
-        })
+    //     })
 
 
 
-    }
+    // }
 
 
 

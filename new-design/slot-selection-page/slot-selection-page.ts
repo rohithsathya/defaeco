@@ -3,7 +3,7 @@ import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor, DefaecoVendorPackageAddons, DefaecoVendorPackage } from '../services/interfaces/DefaecoVendor';
 import { SlotService, DefaecoSlot } from '../services/slot.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { DataService } from '../services/data.service';
 
 @Component({
@@ -29,7 +29,7 @@ export class AppSlotSelectionPage implements OnInit {
     userPickedTime:any = new Date();
     selectedSlot:any = {};
 
-    constructor(private router: Router, private vendorService:VendorDataService,private route: ActivatedRoute,private slotService:SlotService,public alertController: AlertController,private dataService: DataService) { }
+    constructor(private router: Router, private vendorService:VendorDataService,private route: ActivatedRoute,private slotService:SlotService,public alertController: AlertController,private dataService: DataService,private navCtrl: NavController) { }
     ngOnInit(){}
     ionViewWillEnter(){
 
@@ -174,8 +174,19 @@ export class AppSlotSelectionPage implements OnInit {
         await this.showAvailableSlots(this.userPickedTime,this.totalSlotsRequired);
         await busySpinner.dismiss();
     }
+    navigateToAddonPage(){
+
+        let navigationExtras: NavigationExtras = {
+            queryParams: {
+                "vendorId": this.vendor.id,
+                "selectedPackage":this.selectedPackage.code
+            }
+          };
+        this.router.navigate(['/', 'add-options'],navigationExtras); //main
+
+    }
     gobackToListingPage() {
-        this.router.navigate(['/main', 'vendors-list']); 
+        this.navCtrl.navigateRoot('', { animated: true });
     }
     
     proceedClick(){

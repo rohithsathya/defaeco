@@ -1,7 +1,9 @@
 <ion-header *ngIf="vendor">
-    <ion-toolbar color="primary">
+    <ion-toolbar color="dark">
         <ion-buttons slot="start">
-            <ion-back-button></ion-back-button>
+                <ion-button (click)="navigateToVendorsPage()">
+                    <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+                </ion-button>
         </ion-buttons>
         <ion-title>
             {{vendor.name}}
