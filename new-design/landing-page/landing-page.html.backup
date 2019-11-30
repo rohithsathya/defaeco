@@ -1,0 +1,92 @@
+<ion-content>
+        <div class="wrapper">
+    
+            <ion-slides class="wrapper" pager="true" [options]="slideOpts">
+                <ion-slide>
+    
+                    <div class="wrapper vertical">
+                        <div class="wrapper center-vertical center-horizontal" style="flex:8;">
+                            <img src="assets/img/logoHomePage.png" style="width: 80%" />
+                        </div>
+                        <div class="wrapper center-vertical center-horizontal" style="flex:2;">
+                            <ion-label>
+                                <p>
+                                    Already have an account? 
+                                    <a (click)="navigateToLoginPage()" style="text-decoration: none">Log in</a>
+                                </p>
+                            </ion-label>
+                        </div>
+                    </div>
+    
+                </ion-slide>
+    
+                <ion-slide>
+                    <div class="wrapper vertical">
+                            <div style="flex:4">
+                                <div class="wrapper" style="background-image:url('../assets/img/homePageBanner3.jpg')">
+                                </div>
+                            </div>
+                            <div style="flex:6">
+                                    <div style="margin-top:50px">
+                                        <h5>THE CAR WASH NOW COMES TO YOU</h5>
+                                        <div style="width: 50px;height:1px;background:black;margin:auto;margin-top:32px"></div>
+                                        <ion-label>
+                                            <p style="margin-top: 32px">Get a professional detailer right at your hone or office
+                                                within 3 hours</p>
+                                        </ion-label>
+                                    </div>
+                                </div>
+                    </div>
+                </ion-slide>
+    
+                <ion-slide>
+                    <div class="wrapper vertical">
+                        <div style="flex:4">
+                            <div class="wrapper" style="background-image:url('../assets/img/homePageBanner4.jpg')">
+                            </div>
+                        </div>
+                        <div style="flex:6">
+                            <div style="margin-top:50px">
+                                <h5>HIGH QUALITY BEFORE ALL</h5>
+                                <div style="width: 50px;height:1px;background:black;margin:auto;margin-top:32px"></div>
+                                <ion-label>
+                                    <p style="margin-top: 32px">Get a professional detailer right at your hone or office
+                                        within 3 hours</p>
+                                </ion-label>
+                            </div>
+                        </div>
+                    </div>
+                </ion-slide>
+    
+                <ion-slide>
+                    <div class="wrapper vertical">
+                        <div style="flex:4">
+                            <div class="wrapper" style="background-image:url('../assets/img/homePageBanner1.png')">
+                            </div>
+                        </div>
+                        <div class="wrapper vertical" style="flex:6;">
+    
+                            <div style="flex:8">
+                                <div style="margin-top:50px">
+                                    <h5>CONVENIENT AND SECURE</h5>
+                                    <div style="width: 50px;height:1px;background:black;margin:auto;margin-top:32px"></div>
+                                    <ion-label>
+                                        <p style="margin-top: 32px">Get a professional detailer right at your hone or office
+                                            within 3 hours</p>
+                                    </ion-label>
+                                </div>
+                            </div>
+                            <div style="flex:2">
+                                <div style="width: 80%;margin:auto">
+                                    <ion-button expand="full" (click)="navigateToLoginPage()">Log in / Register</ion-button>
+                                </div>
+    
+                            </div>
+                        </div>
+                    </div>
+    
+                </ion-slide>
+            </ion-slides>
+    
+        </div>
+    </ion-content>

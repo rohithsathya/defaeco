@@ -46,7 +46,6 @@ export class AppLogInPage implements OnInit {
     async loginWithEmail() {
         let busySpinner: any;
         try {
-
             let fieldsValid = this.canLogin();
             if (fieldsValid) {
                 busySpinner = await this.uiService.presentBusySpinner();

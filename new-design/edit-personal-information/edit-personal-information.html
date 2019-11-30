@@ -1,72 +1,99 @@
 <ion-header>
     <ion-toolbar color="dark">
+            <ion-buttons slot="start">
+                    <ion-button (click)="navigateToAccountPage()">
+                      <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
         <ion-title>Edit Profile</ion-title>
-        <ion-buttons slot="secondary">
-            <ion-button (click)="navigateToAccountPage()">
-                <ion-icon slot="icon-only" name="close"></ion-icon>
-            </ion-button>
-        </ion-buttons>
     </ion-toolbar>
 </ion-header>
 
 <ion-content>
-    <ion-grid>
-        <ion-row>
-            <ion-col>
-                <div style="text-align: center;">
-                    <input type="file" hidden (change)="uploadFile($event)" accept="image/*" #dp_file_input>
-                    <img class="profile-pic-container" *ngIf="userProfile.photoURL" (click)="dp_file_input.click()"
-                        [src]="userProfile.photoURL" style="max-width: 75%;" />
-                    <img class="profile-pic-container" *ngIf="!userProfile.photoURL" (click)="dp_file_input.click()"
-                        src="assets/img/slider1.png" style="max-width: 75%;" />
-
-                </div>
-            </ion-col>
-
-        </ion-row>
-        <ion-row>
-            <ion-col>
-                <ion-list lines="full" class="ion-no-margin ion-no-padding">
-                    <ion-item style="margin-bottom: 16px;">
-                        <ion-label position="floating">Display Name<ion-text color="danger">*</ion-text>
-                        </ion-label>
-                        <ion-input required type="text" [(ngModel)]="userProfile.displayName"></ion-input>
-                    </ion-item>
-                    <ion-item style="margin-bottom: 16px;">
-                        <ion-label position="floating">Email <ion-text color="danger">*</ion-text>
-                        </ion-label>
-                        <ion-input required inputmode="email" readonly disabled [(ngModel)]="userProfile.email">
-                        </ion-input>
-                    </ion-item>
-                    <ion-item style="margin-bottom: 16px;">
-                        <ion-label position="floating">Mobile <ion-text color="danger">*</ion-text>
-                        </ion-label>
-                        <ion-input required inputmode="tel" [(ngModel)]="userProfile.phoneNumber"></ion-input>
-                    </ion-item>
-                    <ion-item style="margin-bottom: 16px;">
-                        <ion-label position="floating">Vehicle Reg No</ion-label>
-                        <ion-input type="text" [(ngModel)]="userProfile.regNo"></ion-input>
-                    </ion-item>
-                    <ion-item style="margin-bottom: 16px;">
-                        <ion-label>Vehicle Type</ion-label>
-                        <ion-select placeholder="Select Vehicle Type" [(ngModel)]="userProfile.vehicleType">
-                            <ion-select-option value="hatchback">Hatchback</ion-select-option>
-                            <ion-select-option value="sedan">Sedan</ion-select-option>
-                            <ion-select-option value="suv">SUV</ion-select-option>
-                            <ion-select-option value="twowheeler">Two Wheeler</ion-select-option>
-                        </ion-select>
-                    </ion-item>
-                    <!-- <ion-item style="margin-bottom: 16px;">
-                        <ion-label position="floating">Address</ion-label>
-                        <ion-input placeholder="Address Line 1" [(ngModel)]="userProfile.addressLine1"></ion-input>
-                        <ion-input placeholder="Address Line 2" [(ngModel)]="userProfile.addressLine2"></ion-input>
-                        <ion-input placeholder="City" [(ngModel)]="userProfile.addressLine3"></ion-input>
-                        <ion-input placeholder="State" [(ngModel)]="userProfile.addressLine4"></ion-input>
-                    </ion-item> -->
-                </ion-list>
-            </ion-col>
-        </ion-row>
-    </ion-grid>
+    <div *ngIf="!isLoading">
+            <ion-grid>
+                    <ion-row>
+                        <ion-col>
+                            <div style="text-align: center;">
+                                <input type="file" hidden (change)="uploadFile($event)" accept="image/*" #dp_file_input>
+                                <img class="profile-pic-container" *ngIf="userProfile.photoURL" (click)="dp_file_input.click()"
+                                    [src]="userProfile.photoURL" style="max-width: 75%;" />
+                                <img class="profile-pic-container" *ngIf="!userProfile.photoURL" (click)="dp_file_input.click()"
+                                    src="assets/img/slider1.png" style="max-width: 75%;" />
+            
+                            </div>
+                        </ion-col>
+            
+                    </ion-row>
+                    <ion-row>
+                        <ion-col>
+                            <ion-list lines="full" class="ion-no-margin ion-no-padding">
+                                <ion-item style="margin-bottom: 16px;">
+                                    <ion-label position="floating">Display Name<ion-text color="danger">*</ion-text>
+                                    </ion-label>
+                                    <ion-input required type="text" [(ngModel)]="userProfile.displayName"></ion-input>
+                                </ion-item>
+                                <ion-item style="margin-bottom: 16px;">
+                                    <ion-label position="floating">Email <ion-text color="danger">*</ion-text>
+                                    </ion-label>
+                                    <ion-input required inputmode="email" readonly disabled [(ngModel)]="userProfile.email">
+                                    </ion-input>
+                                </ion-item>
+                                <ion-item style="margin-bottom: 16px;">
+                                    <ion-label position="floating">Mobile <ion-text color="danger">*</ion-text>
+                                    </ion-label>
+                                    <ion-input required inputmode="tel" [(ngModel)]="userProfile.phoneNumber"></ion-input>
+                                </ion-item>
+                                <ion-item style="margin-bottom: 16px;">
+                                    <ion-label position="floating">Vehicle Reg No</ion-label>
+                                    <ion-input type="text" [(ngModel)]="userProfile.regNo"></ion-input>
+                                </ion-item>
+                                <ion-item style="margin-bottom: 16px;">
+                                    <ion-label>Vehicle Type</ion-label>
+                                    <ion-select placeholder="Select Vehicle Type" [(ngModel)]="userProfile.vehicleType">
+                                        <ion-select-option value="hatchback">Hatchback</ion-select-option>
+                                        <ion-select-option value="sedan">Sedan</ion-select-option>
+                                        <ion-select-option value="suv">SUV</ion-select-option>
+                                        <ion-select-option value="twowheeler">Two Wheeler</ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                                <!-- <ion-item style="margin-bottom: 16px;">
+                                    <ion-label position="floating">Address</ion-label>
+                                    <ion-input placeholder="Address Line 1" [(ngModel)]="userProfile.addressLine1"></ion-input>
+                                    <ion-input placeholder="Address Line 2" [(ngModel)]="userProfile.addressLine2"></ion-input>
+                                    <ion-input placeholder="City" [(ngModel)]="userProfile.addressLine3"></ion-input>
+                                    <ion-input placeholder="State" [(ngModel)]="userProfile.addressLine4"></ion-input>
+                                </ion-item> -->
+                            </ion-list>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+    </div>
+    <div *ngIf="isLoading">
+        <ion-grid>
+            <ion-row>
+                <ion-col>
+                    <div style="text-align: center;">
+                        <div style="height:120px;width:120px;background: #eeeeee;border-radius:50%;margin: auto;"></div>
+                    </div>
+                </ion-col>
+    
+            </ion-row>
+            <ion-row>
+                <ion-col>
+                    <ion-list lines="full" class="ion-no-margin ion-no-padding">
+                        <ion-item style="margin-bottom: 16px;" *ngFor="let sk of skeletonElements">
+                            <ion-label >
+                                    <h2><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h2>
+                                    <p><ion-skeleton-text animated style="width: 80%"></ion-skeleton-text></p>
+                            </ion-label>
+                        </ion-item>
+                    </ion-list>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </div>
+    
 </ion-content>
 
 <ion-footer>

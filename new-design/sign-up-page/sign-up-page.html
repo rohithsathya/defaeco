@@ -1,8 +1,8 @@
 <ion-header>
     <ion-toolbar color="dark">
             <ion-buttons slot="start">
-                    <ion-button (click)="navigateToLandingPage()">
-                        <ion-icon slot="start" name="close"></ion-icon>
+                    <ion-button (click)="navigateLogInPage()">
+                        <ion-icon slot="start" name="arrow-back"></ion-icon>
                     </ion-button>
             </ion-buttons>
         <ion-title>
@@ -30,11 +30,11 @@
         </ion-item>
 
         <ion-button expand="full" style="margin: 24px 16px" (click)="signUpWithEmail()">Sign Up</ion-button>
-        <ion-label style="width: 100%;text-align: center">
+        <ion-text style="width: 100%;text-align: center">
             <p>
                 Already have an account? <a (click)="navigateLogInPage()" style="text-decoration: none">Log in</a>
             </p>
-        </ion-label>
+        </ion-text>
 
     </div>
 

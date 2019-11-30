@@ -86,7 +86,8 @@ export class AppSlotSelectionPage implements OnInit {
 
             }catch(e){
                 this.isLoading = false;
-                console.log("Error",e)
+                console.log("Error",e);
+                this.navigateToErrorPage();
             }
         }); 
 
@@ -192,7 +193,7 @@ export class AppSlotSelectionPage implements OnInit {
         });
     
         await alert.present();
-      }
+    }
 
     async dateChange(event){
         this.userPickedTime = new Date(event.target.value);
@@ -202,20 +203,23 @@ export class AppSlotSelectionPage implements OnInit {
     }
     navigateToAddonPage(){
         this.navCtrl.navigateForward(`add-options?vendorId=${encodeURI(this.vendor.id)}&selectedPackage=${encodeURI(this.selectedPackage.code)}&addons=${encodeURI(this.selectedAddonIds.toString())}`, { animated: true });
-
-
     }
     gobackToListingPage() {
         this.navCtrl.navigateRoot('', { animated: true });
     }
     
     proceedClick(){
-        this.dataService.setCurrentOrderSumaryObj(this.vendor,this.selectedPackage,this.selectedAddonIds,this.selectedSlot,this.userPickedTime);
-        //this.router.navigate(['/', 'order-summary']); 
-        this.navCtrl.navigateForward('order-summary', { animated: true });
+        if(this.selectedSlot && this.selectedSlot.isSelected){
+            this.dataService.setCurrentOrderSumaryObj(this.vendor,this.selectedPackage,this.selectedAddonIds,this.selectedSlot,this.userPickedTime);
+            this.navCtrl.navigateForward('order-summary', { animated: true });
+        }
+       
     }
     navigateToWelcomePage(){
         this.navCtrl.navigateRoot('welcome', { animated: true });
-      }
+    }
+    navigateToErrorPage() {
+        this.navCtrl.navigateForward("error", { animated: true });
+    }
 
 }

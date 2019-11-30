@@ -31,8 +31,7 @@ export class AppOptionSelectionPage implements OnInit {
     user:User;
     skeletonElements:any[] = Array(5);
     isLoading:boolean = false;
-    constructor(private router: Router, 
-        private vendorService:VendorDataService,
+    constructor(private vendorService:VendorDataService,
         private authService:AuthenticationService,
         private route: ActivatedRoute,
         private navCtrl: NavController) { }
@@ -70,6 +69,7 @@ export class AppOptionSelectionPage implements OnInit {
         }catch(e){
             this.isLoading = false;
             console.log("Error",e);
+            this.navigateToErrorPage();
         }
         
         
@@ -92,8 +92,6 @@ export class AppOptionSelectionPage implements OnInit {
                 this.selectedAddonIds.push(addon.code);
             }
         }
-
-
     }
     gobackToListingPage() {
         this.navCtrl.navigateRoot('', { animated: true });
@@ -106,6 +104,9 @@ export class AppOptionSelectionPage implements OnInit {
     }
     navigateToWelcomePage(){
         this.navCtrl.navigateRoot('welcome', { animated: true });
-      }
+    }
+    navigateToErrorPage() {
+        this.navCtrl.navigateForward("error", { animated: true });
+    }
 
 }

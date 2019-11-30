@@ -3,11 +3,13 @@ import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor, DefaecoVendorPackageAddons, DefaecoVendorPackage } from '../services/interfaces/DefaecoVendor';
 import { SlotService, DefaecoSlot } from '../services/slot.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { DataService } from '../services/data.service';
 import { OrderService, DefaecoOrder } from '../services/order.service';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { LoginService } from '../services/login.service';
+import { AuthenticationService, User } from '../services/authentication.service';
+import { UiService } from '../services/ui.service';
 
 @Component({
     selector: 'app-slot-reschudle-page',
@@ -35,46 +37,69 @@ export class AppSlotReshudlePage implements OnInit {
     selectedSlot: any = {};
     order: DefaecoOrder;
     orderId: string;
-    user: any;
+    user: User;
     slotsCollectionToSave: any[] = [];
-    constructor(private router: Router, private loginService: LoginService, private vendorService: VendorDataService, private route: ActivatedRoute, private slotService: SlotService, public alertController: AlertController, private dataService: DataService, private afs: AngularFirestore, private orderService: OrderService) { }
+    isLoading:boolean = false;
+    constructor( 
+        private vendorService: VendorDataService, 
+        private route: ActivatedRoute, 
+        private slotService: SlotService, 
+        public alertController: AlertController,
+        private afs: AngularFirestore, 
+        private orderService: OrderService,
+        private authService: AuthenticationService, 
+        private navCtrl: NavController,
+        private uiService:UiService) { }
     ngOnInit(){}
     ionViewWillEnter() {
 
+        this.user = this.authService.getCurrentUser();
+        if (this.user) {
+            this.init();
+        } else {
+            this.navigateToWelcomePage();
+        }
+    }
+    init() {
+
         this.route.queryParams.subscribe(async (params) => {
-            this.vendorId = params["vendorId"];
-            this.selectedPackageId = params["selectedPackage"];
-            this.selectedAddonIds = params["addons"];
-            this.orderId = params["orderId"];
+            try {
+                this.isLoading = true;
 
-            if (this.vendorId) {
+                this.vendorId = params["vendorId"];
+                this.selectedPackageId = params["selectedPackage"];
+                this.selectedAddonIds = params["addons"];
+                this.orderId = params["orderId"];
 
-                let busySpinner: any = await this.dataService.presentBusySpinner();
-                this.user = await this.loginService.checkIfAccountIsVerified();
-                this.vendor = await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
-                await busySpinner.dismiss();
-
-                this.parseVendorAndGetAddons();
-                //this.selectedPackage.type: "Basic" "Premium"
-                this.isPremium = this.selectedPackage.type == "Premium" ? true : false;
-                this.grandTotal = this.selectedPackage.price;
-                this.totalSlotsRequired = this.selectedPackage.noOfSlotsNeeded;
-                for (let i = 0; i < this.selectedPackage.addOns.length; i++) {
-                    let currentAddOn = this.selectedPackage.addOns[i];
-                    if (this.selectedAddonIds.indexOf(currentAddOn.code) >= 0) {
-                        this.grandTotal = this.grandTotal + currentAddOn.price;
-                        this.totalSlotsRequired = this.totalSlotsRequired + currentAddOn.noOfSlotsNeeded;
+                if (this.vendorId && this.orderId && this.selectedPackageId) {
+                    this.vendor = await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
+                    this.parseVendorAndGetAddons();
+                    //this.selectedPackage.type: "Basic" "Premium"
+                    this.isPremium = this.selectedPackage.type == "Premium" ? true : false;
+                    this.grandTotal = this.selectedPackage.price;
+                    this.totalSlotsRequired = this.selectedPackage.noOfSlotsNeeded;
+                    for (let i = 0; i < this.selectedPackage.addOns.length; i++) {
+                        let currentAddOn = this.selectedPackage.addOns[i];
+                        if (this.selectedAddonIds.indexOf(currentAddOn.code) >= 0) {
+                            this.grandTotal = this.grandTotal + currentAddOn.price;
+                            this.totalSlotsRequired = this.totalSlotsRequired + currentAddOn.noOfSlotsNeeded;
+                        }
                     }
+                    await this.showAvailableSlots(this.userPickedTime, this.totalSlotsRequired);
+                    this.isLoading = false;
                 }
-                let busySpinner1: any = await this.dataService.presentBusySpinner();
-                await this.showAvailableSlots(this.userPickedTime, this.totalSlotsRequired);
-                await busySpinner1.dismiss();
+                else {
+                    this.isLoading = false;
+                    this.navigateToOrderListingPage();
+                }
+
+            } catch (e) {
+                console.log("error", e);
+                this.isLoading = false;
             }
-            else {
-                //if vendor is not present go to listing page
-                this.gobackToListingPage();
-            }
+
         });
+
     }
     parseVendorAndGetAddons() {
         for (let i = 0; i < this.vendor.packageMatrix.length; i++) {
@@ -181,31 +206,36 @@ export class AppSlotReshudlePage implements OnInit {
 
     async dateChange(event) {
         this.userPickedTime = new Date(event.target.value);
-        let busySpinner: any = await this.dataService.presentBusySpinner();
+        let busySpinner: any = await this.uiService.presentBusySpinner();
         await this.showAvailableSlots(this.userPickedTime, this.totalSlotsRequired);
         await busySpinner.dismiss();
     }
-    gobackToListingPage() {
-        this.router.navigate(['/main', 'vendors-list']);
-    }
-
+    
     async proceedClick() {
-        this.order = await this.orderService.getMyOrderById(this.orderId) as DefaecoOrder;
-        console.log("order", this.order);
-         //repoen old slots
-         await this.reopenTheSlots();
-        //add new slots
-        await this.addNewSlots();
-        //update the order
-        this.updateOrderObj();
-        await this.orderService.updateOrder(this.order);
-        //show successmessage and take him to order listing page
-        this.dataService.presentToast("Order Rescheduled Successfully");
-        this.navigateToOrderListingPage();
+        if (this.selectedSlot && this.selectedSlot.isSelected) {
+            let busySpinner: any = await this.uiService.presentBusySpinner();
+            try {
+                this.order = await this.orderService.getMyOrderById(this.orderId) as DefaecoOrder;
+                console.log("order", this.order);
+                //repoen old slots
+                await this.reopenTheSlots();
+                //add new slots
+                await this.addNewSlots();
+                //update the order
+                this.updateOrderObj();
+                await this.orderService.updateOrder(this.order);
+                busySpinner.dismiss();
+                //show successmessage and take him to order listing page
+                this.uiService.presentToast("Order Rescheduled Successfully");
+                this.navigateToOrderListingPage();
 
+            } catch (e) {
+                console.log("error", e);
+                this.uiService.presentToast("Error occurred");
+                busySpinner.dismiss();
 
-        // this.dataService.setCurrentOrderSumaryObj(this.vendor,this.selectedPackage,this.selectedAddonIds,this.selectedSlot,this.userPickedTime);
-        // this.router.navigate(['/', 'order-summary']); 
+            }
+        }
     }
     async reopenTheSlots() {
 
@@ -293,8 +323,15 @@ export class AppSlotReshudlePage implements OnInit {
         this.order.slot = this.selectedSlot;
         this.order.allSlots = this.slotsCollectionToSave;
     }
+
     navigateToOrderListingPage() {
-        this.router.navigate(['main/','booking'])
+        this.navCtrl.navigateRoot('bookings', { animated: true });
+    }
+    navigateToBookingDetailsPage(){
+        this.navCtrl.navigateBack('booking-detail', { animated: true });
+    }
+    navigateToWelcomePage() {
+        this.navCtrl.navigateRoot('welcome', { animated: true });
     }
 
 }

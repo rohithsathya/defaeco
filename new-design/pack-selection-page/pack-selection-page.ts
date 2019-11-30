@@ -50,6 +50,7 @@ export class AppPackSelectionPage implements OnInit {
             }catch(e){
                 console.log("Error",e);
                 this.isLoading = false;
+                this.navigateToErrorPage();
             }
         }); 
     }
@@ -62,16 +63,7 @@ export class AppPackSelectionPage implements OnInit {
         this.subTotal = this.selectedPackage.price;
     }
     navigateToPersonalDetailsConfirmationPage(){
-        // let navigationExtras: NavigationExtras = {
-        //     queryParams: {
-        //         "vendorId": this.vendor.id
-        //     }
-        // };
-        // this.router.navigate(['/', 'confirm-personal-details'], navigationExtras); //main
-
         this.navCtrl.navigateForward(`confirm-personal-details?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
-
-
     }
     gobackToListingPage() {
         this.navCtrl.navigateRoot('', { animated: true });
@@ -80,16 +72,10 @@ export class AppPackSelectionPage implements OnInit {
         this.navCtrl.navigateRoot('welcome', { animated: true });
       }
     proceedClick() {
-
         this.navCtrl.navigateForward(`add-options?vendorId=${encodeURI(this.vendor.id)}&selectedPackage=${this.selectedPackage.code}`, { animated: true });
-
-        // let navigationExtras: NavigationExtras = {
-        //     queryParams: {
-        //         "vendorId": this.vendor.id,
-        //         "selectedPackage":this.selectedPackage.code
-        //     }
-        //   };
-        // this.router.navigate(['/', 'add-options'],navigationExtras); //main
+    }
+    navigateToErrorPage() {
+        this.navCtrl.navigateForward("error", { animated: true });
     }
 
 

@@ -1,92 +1,79 @@
 <ion-content>
-        <div class="wrapper">
-    
-            <ion-slides class="wrapper" pager="true" [options]="slideOpts">
-                <ion-slide>
-    
-                    <div class="wrapper vertical">
-                        <div class="wrapper center-vertical center-horizontal" style="flex:8;">
-                            <img src="assets/img/logoHomePage.png" style="width: 80%" />
-                        </div>
-                        <div class="wrapper center-vertical center-horizontal" style="flex:2;">
-                            <ion-label>
-                                <p>
-                                    Already have an account? 
-                                    <a (click)="navigateToLoginPage()" style="text-decoration: none">Log in</a>
-                                </p>
-                            </ion-label>
+    <div class="wrapper">
+        <ion-slides class="wrapper" pager="true" [options]="slideOpts">
+            <ion-slide>
+
+                <div class="wrapper vertical">
+                    <div class="wrapper center-vertical center-horizontal" style="flex:8;">
+
+                        <img src="assets/img/welcomePage/logo.jpg" style="width: 80%" />
+                    </div>
+                    <div class="wrapper center-vertical center-horizontal" style="flex:2;">
+                        <ion-text>
+                            <p>
+                                Already have an account?
+                                <a (click)="navigateToLoginPage()" style="text-decoration: none">Log in</a>
+                            </p>
+                        </ion-text>
+                    </div>
+                </div>
+
+            </ion-slide>
+
+            <ion-slide>
+                <div class="wrapper vertical">
+                    <div style="flex:1" class="center-horizontal center-vertical">
+                        <div>
+                            <img src="assets/img/welcomePage/book-appointment.png" style="max-width: 80%" />
+
+                            <div class="step-counter">
+                                <h1 style="line-height: 60px;">1</h1>
+                            </div>
+                            <h2>Book your appointment</h2>
+                            <p>Tell us when and where to meet you.</p>
                         </div>
                     </div>
-    
-                </ion-slide>
-    
-                <ion-slide>
-                    <div class="wrapper vertical">
-                            <div style="flex:4">
-                                <div class="wrapper" style="background-image:url('../assets/img/homePageBanner3.jpg')">
-                                </div>
+                </div>
+            </ion-slide>
+
+            <ion-slide>
+                <div class="wrapper vertical">
+                    <div style="flex:1" class="center-horizontal center-vertical">
+                        <div>
+                            <img src="assets/img/welcomePage/remainder.png" style="max-width: 80%" />
+
+                            <div class="step-counter">
+                                <h1 style="line-height: 60px;">2</h1>
                             </div>
-                            <div style="flex:6">
-                                    <div style="margin-top:50px">
-                                        <h5>THE CAR WASH NOW COMES TO YOU</h5>
-                                        <div style="width: 50px;height:1px;background:black;margin:auto;margin-top:32px"></div>
-                                        <ion-label>
-                                            <p style="margin-top: 32px">Get a professional detailer right at your hone or office
-                                                within 3 hours</p>
-                                        </ion-label>
-                                    </div>
-                                </div>
-                    </div>
-                </ion-slide>
-    
-                <ion-slide>
-                    <div class="wrapper vertical">
-                        <div style="flex:4">
-                            <div class="wrapper" style="background-image:url('../assets/img/homePageBanner4.jpg')">
-                            </div>
-                        </div>
-                        <div style="flex:6">
-                            <div style="margin-top:50px">
-                                <h5>HIGH QUALITY BEFORE ALL</h5>
-                                <div style="width: 50px;height:1px;background:black;margin:auto;margin-top:32px"></div>
-                                <ion-label>
-                                    <p style="margin-top: 32px">Get a professional detailer right at your hone or office
-                                        within 3 hours</p>
-                                </ion-label>
-                            </div>
+                            <h2>Get your car serviced</h2>
+                            <p>An assigned detail professional will meet you at your location, fully equipped, and ready
+                                to provide services requested.</p>
                         </div>
                     </div>
-                </ion-slide>
-    
-                <ion-slide>
-                    <div class="wrapper vertical">
-                        <div style="flex:4">
-                            <div class="wrapper" style="background-image:url('../assets/img/homePageBanner1.png')">
+                </div>
+            </ion-slide>
+
+            <ion-slide>
+                <div class="wrapper vertical">
+                    <div style="flex:1" class="center-horizontal center-vertical">
+                        <div>
+
+                            <img src="assets/img/welcomePage/rate.png" style="max-width: 80%" />
+                            <div class="step-counter">
+                                <h1 style="line-height: 60px;">3</h1>
                             </div>
-                        </div>
-                        <div class="wrapper vertical" style="flex:6;">
-    
-                            <div style="flex:8">
-                                <div style="margin-top:50px">
-                                    <h5>CONVENIENT AND SECURE</h5>
-                                    <div style="width: 50px;height:1px;background:black;margin:auto;margin-top:32px"></div>
-                                    <ion-label>
-                                        <p style="margin-top: 32px">Get a professional detailer right at your hone or office
-                                            within 3 hours</p>
-                                    </ion-label>
-                                </div>
-                            </div>
-                            <div style="flex:2">
-                                <div style="width: 80%;margin:auto">
-                                    <ion-button expand="full" (click)="navigateToLoginPage()">Log in / Register</ion-button>
-                                </div>
-    
+                            <h2>Rate your service</h2>
+                            <p>At the end of the job, rate your detailer accordingly. Your feedback is essential to our
+                                growth!.</p>
+                            <div style="width: 80%;margin:auto">
+                                <ion-button color="defaeco-primary" fill="clear" class="outline" expand="full"
+                                    (click)="navigateToLoginPage()">Get Started</ion-button>
                             </div>
                         </div>
                     </div>
-    
-                </ion-slide>
-            </ion-slides>
-    
-        </div>
-    </ion-content>
+                </div>
+            </ion-slide>
+        </ion-slides>
+
+    </div>
+</ion-content>

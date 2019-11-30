@@ -1,0 +1,28 @@
+<ion-content fullscreen padding scroll-y="false">
+        <div class="wrapper">
+    <ion-slides>
+        <ion-slide>
+            <div class="wrapper vertical">
+                <div style="flex:1" class="wrapper vertical center-vertical center-horizontal">
+                        <div>
+                            <img src="assets/img/welcomePage/error.jpg" style="width: 80%" />
+                        </div>
+                        <div>
+                            <p>Something Went Terribly Wrong</p>
+                            <ion-label>
+                                <p>Please check your network connection and reload the page.</p>
+                            </ion-label>
+
+                        </div>
+                        <div style="margin-top: 24px;" (click)="navigateToErrorOnPage()">
+                            <ion-button color="defaeco-primary">Reload</ion-button>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <ion-button fill="clear" (click)="navigateToHomePage()" color="defaeco-primary"><ion-icon slot="start" name="arrow-back"></ion-icon> Home</ion-button>
+                        </div>
+                </div>
+            </div>
+        </ion-slide>
+    </ion-slides>
+    </div>
+    </ion-content>

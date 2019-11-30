@@ -171,25 +171,7 @@ import * as firebase from "firebase";
         
     }
 
-    async getVendorList(areaName){
-        this.getLoggedInuserInfo();
-      return  new Promise(async (res,rej)=>{
-            try{
-                let vendorsCollection = this.afs.collection<DefaecoVendor>('vendors',ref => ref.where('areaNames', 'array-contains', areaName));
-                let vendorsList  = await vendorsCollection.get().toPromise();
-                let _tempList:DefaecoVendor[] = [];
-                vendorsList.forEach((doc) => {
-                    let vendor:DefaecoVendor = doc.data() as DefaecoVendor;
-                    _tempList.push(vendor); 
-                });
-                res(_tempList);
-            }catch(e){
-                console.log("ERROR!!!",e);
-                rej(e);
-            }
-
-        })
-    }
+    
     async addVendor(vendor: DefaecoVendor) {
         let vendorsCollection = this.afs.collection<DefaecoVendor>('vendors');
         const id = this.afs.createId();
@@ -310,12 +292,6 @@ import * as firebase from "firebase";
         */
     }
 
-    setCurrentVendor(vendor:DefaecoVendor){
-        this.selectedVendor = vendor;
-    }
-    getCurrentVendor(){
-        return this.selectedVendor;
-    }
     getVendorById(id:string){
         return new Promise(async (resolve,reject)=>{
             try{
@@ -558,6 +534,32 @@ import * as firebase from "firebase";
         }
 
         console.log("updated",this.baySlotsMatrix);
+    }
+
+    //new methods
+    async getVendorList(areaName){
+        return  new Promise(async (res,rej)=>{
+              try{
+                  let vendorsCollection = this.afs.collection<DefaecoVendor>('vendors',ref => ref.where('areaNames', 'array-contains', areaName));
+                  let vendorsList  = await vendorsCollection.get().toPromise();
+                  let _tempList:DefaecoVendor[] = [];
+                  vendorsList.forEach((doc) => {
+                      let vendor:DefaecoVendor = doc.data() as DefaecoVendor;
+                      _tempList.push(vendor); 
+                  });
+                  res(_tempList);
+              }catch(e){
+                  console.log("ERROR!!!",e);
+                  rej(e);
+              }
+  
+          })
+    }
+    setCurrentVendor(vendor:DefaecoVendor){
+        this.selectedVendor = vendor;
+    }
+    getCurrentVendor(){
+        return this.selectedVendor;
     }
 
 

@@ -72,14 +72,11 @@ export class AppOrderSummaryPage implements OnInit {
                         this.totalSlotsRequired = this.totalSlotsRequired + currentAddOn.noOfSlotsNeeded;
                     }
                 }
-
                 this.startTime = this.slot.isTomorrow ? 'Tomorrow' : 'Today';
                 this.startTime = `${this.startTime} ${this.slot.time}`;
 
                 this.endTime = this.slot.isExtended ? 'Tomorrow' : 'Today';
                 this.endTime = `${this.endTime} ${this.slot.deliveryTime}`;
-
-                // getSlotsInformation
 
             } else {
                 this.navigateToMainPage();
@@ -87,7 +84,7 @@ export class AppOrderSummaryPage implements OnInit {
 
         } catch (e) {
             console.log("Error", e);
-            this.navigateToMainPage();
+            this.navigateToErrorPage();
         }
 
 
@@ -185,8 +182,10 @@ export class AppOrderSummaryPage implements OnInit {
         this.navCtrl.navigateRoot('', { animated: true });
     }
     navigateToSlotSelectionPage() {
-        //vendorId=PvDQYoTMcnBCH8wE9XSq&selectedPackage=P-2&addons=
        this.navCtrl.navigateRoot(`pick-slot?vendorId=${encodeURI(this.vendor.id)}&selectedPackage=${encodeURI(this.package.code)}&addons=${encodeURI(this.addonIds)}`, { animated: true });
+    }
+    navigateToErrorPage() {
+        this.navCtrl.navigateForward("error", { animated: true });
     }
 
 }

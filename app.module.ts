@@ -62,6 +62,7 @@ import { AppSlotReshudlePage } from './new-design/slot-reschudle-page/slot-resch
 import { AuthenticationService } from './new-design/services/authentication.service';
 import { DefaecoWelcomePageComponent } from './production/components/welcome-page/welcome-page';
 import { UiService } from './new-design/services/ui.service';
+import { ErrorPage } from './new-design/error-page/error-page';
 
 @NgModule({
   declarations: [
@@ -87,6 +88,7 @@ import { UiService } from './new-design/services/ui.service';
     AppSlotReshudlePage,
     //Production
     DefaecoWelcomePageComponent,
+    ErrorPage
   ],
   entryComponents: [
     AppLocationSelectionComponent

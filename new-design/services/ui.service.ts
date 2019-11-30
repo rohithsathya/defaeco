@@ -7,7 +7,9 @@ import { ToastController, LoadingController } from '@ionic/angular';
 })
 export class UiService {
 
-    constructor(private statusBar: StatusBar, public toastController: ToastController,public loadingController: LoadingController) { }
+    constructor(private statusBar: StatusBar, 
+        public toastController: ToastController, 
+        public loadingController: LoadingController) { }
 
     setStatusBarColor() {
         // let status bar overlay webview
@@ -41,17 +43,17 @@ export class UiService {
         });
         toast.present();
     }
-    presentBusySpinner(){
-        return new Promise(async (resolve,reject)=>{
-          try{
-            let loadingPopup = await this.loadingController.create({message: 'Please Wait...'});
-            await loadingPopup.present();
-            resolve(loadingPopup);
-          }catch(e){
-            console.error(e);
-            reject();
-          }
+    presentBusySpinner() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let loadingPopup = await this.loadingController.create({ message: 'Please Wait...' });
+                await loadingPopup.present();
+                resolve(loadingPopup);
+            } catch (e) {
+                console.error(e);
+                reject();
+            }
         })
-      }
+    }
 
 }

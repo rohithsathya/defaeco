@@ -1,17 +1,11 @@
-
 <ion-header>
-    <!-- <ion-toolbar color="primary">
-        <ion-title>
-            Car Washes Near Me
-        </ion-title>
-    </ion-toolbar> -->
     <ion-toolbar color="dark">
-            <ion-buttons slot="start">
-                    <ion-menu-button autoHide="false"></ion-menu-button>
-                  </ion-buttons>
+        <ion-buttons slot="start">
+            <ion-menu-button autoHide="false"></ion-menu-button>
+        </ion-buttons>
         <ion-item lines="none" color="dark">
             <ion-label>
-                <h2 style="font-size: 20px;margin-bottom: 5px;">Car Washes @</h2>
+                <h2 style="font-size: 20px;margin-bottom: 5px;">Service Stations</h2>
                 <p style="font-size: 16px;">
                     <ion-icon name="pin" color="primary"></ion-icon>
                     <span *ngIf="!location">Choose Your Location</span>
@@ -26,7 +20,7 @@
 
         </ion-item>
     </ion-toolbar>
-    <ion-toolbar *ngIf="vendorsList && vendorsList.length >0">
+    <ion-toolbar>
         <ion-searchbar (ionChange)="filterVendorsList($event)" mode="ios"></ion-searchbar>
     </ion-toolbar>
 </ion-header>
@@ -47,15 +41,17 @@
                 </ion-chip>
                 <ion-ripple-effect></ion-ripple-effect>
             </ion-item>
-    
-    
+
+
         </ion-list>
         <ion-label *ngIf="!location">
-            <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">Please Select your location to continue...
+            <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">Please Select your location to
+                continue...
             </h2>
         </ion-label>
         <ion-label *ngIf="location && vendorsList && vendorsList.length <=0">
-            <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">No Vendors Found, for selected Location.
+            <h2 style="color: rgba(0,0,0,0.5);margin: 50px 16px;font-size: 20px;">No Vendors Found, for selected
+                Location.
             </h2>
         </ion-label>
     </div>

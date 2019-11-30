@@ -1,7 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { DataService } from '../services/data.service';
-import { LoginService } from '../services/login.service';
 import { AlertController, NavController } from '@ionic/angular';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { OrderService, DefaecoOrder, DefaecoOrderStatus } from '../services/order.service';
@@ -17,61 +15,63 @@ export class AppBookingDetailsPage implements OnInit {
 
   order: DefaecoOrder;
   orderStatusLable = '';
-  orderStausColor='success';
-  isOrderActive:boolean = false;
+  orderStausColor = 'success';
+  isOrderActive: boolean = false;
   user: User;
   bookedForDate: Date = new Date();
   bookedForNextDate: Date = new Date();
   bookedOnDate: Date = new Date();
-  cutOffTime:number = 86400000; //24 hours in milliseconds
-  constructor(private dataService: DataService,public alertController: AlertController, private afs: AngularFirestore,private orderService:OrderService,private authService: AuthenticationService, private navCtrl: NavController,private uiService:UiService) {
+  cutOffTime: number = 86400000; //24 hours in milliseconds
+  constructor(private dataService: DataService,
+    public alertController: AlertController,
+    private afs: AngularFirestore,
+    private orderService: OrderService,
+    private authService: AuthenticationService,
+    private navCtrl: NavController,
+    private uiService: UiService) {
 
   }
-  ngOnInit(){}
+  ngOnInit() { }
   async ionViewWillEnter() {
-    let busySpinner: any;
-    try {
-      busySpinner = await this.uiService.presentBusySpinner();
-      this.user = await this.authService.getVerifiedLoginUser();
-      
-      if (this.user) {
-        this.init();
-      } else {
-        this.navigateToLoginPage();
-      }
-
-      await busySpinner.dismiss();
-    } catch (e) {
-      console.error(e);
-      await busySpinner.dismiss();
+    this.user = this.authService.getCurrentUser();
+    if (this.user) {
+      this.init();
+    } else {
+      this.navigateToWelcomePage();
     }
   }
-  navigateToLoginPage(){
+  navigateToLoginPage() {
     this.navCtrl.navigateRoot('login', { animated: true });
   }
   init() {
-    this.order = this.dataService.getSelectedOrder();
-    if (this.order) {
-      this.bookedForDate = new Date(this.order.date);
-      this.bookedForNextDate = new Date(this.bookedForDate.getDate() + 1);
-      this.bookedOnDate = new Date(this.order.bookedOn.seconds * 1000);
-      this.setupUiElements();
-      console.log("booking details", this.order);
-    } else {
-      this.navigateToBookingsPage();
+    try {
+      this.order = this.dataService.getSelectedOrder();
+      if (this.order) {
+        this.bookedForDate = new Date(this.order.date);
+        this.bookedForNextDate = new Date(this.bookedForDate.getDate() + 1);
+        this.bookedOnDate = new Date(this.order.bookedOn.seconds * 1000);
+        this.setupUiElements();
+        console.log("booking details", this.order);
+      } else {
+        this.navigateToBookingsPage();
+      }
+
+    } catch (e) {
+      console.log("Error", e);
+      this.navigateToErrorPage()
     }
   }
-  setupUiElements(){
-    if(this.order.status == DefaecoOrderStatus.ACTIVE){
+  setupUiElements() {
+    if (this.order.status == DefaecoOrderStatus.ACTIVE) {
       this.orderStatusLable = 'Open';
       this.orderStausColor = 'success';
       this.isOrderActive = true;
-    }else if(this.order.status == DefaecoOrderStatus.CANCELED){
+    } else if (this.order.status == DefaecoOrderStatus.CANCELED) {
       this.orderStatusLable = 'Cancelled';
       this.orderStausColor = 'danger';
       this.isOrderActive = false;
     }
-    else if(this.order.status == DefaecoOrderStatus.COMPELETED){
+    else if (this.order.status == DefaecoOrderStatus.COMPELETED) {
       this.orderStatusLable = 'Done';
       this.orderStausColor = 'secondary';
       this.isOrderActive = false;
@@ -152,7 +152,7 @@ export class AppBookingDetailsPage implements OnInit {
 
 
   }
-  async reScheduleSlotForOrder(orderId){
+  async reScheduleSlotForOrder(orderId) {
 
     let today = new Date().getTime();
     let diff = this.bookedForDate.getTime() - today;
@@ -162,7 +162,7 @@ export class AppBookingDetailsPage implements OnInit {
       this.cantRescheduleForLessThanCuttOffTime();
       return;
     }
-    else{
+    else {
 
       //confirm for reschduling
       const alert = await this.alertController.create({
@@ -184,20 +184,20 @@ export class AppBookingDetailsPage implements OnInit {
           }
         ]
       });
-  
+
       await alert.present();
 
 
-      console.log("order for reschduling",this.order);
+      console.log("order for reschduling", this.order);
     }
 
   }
 
   async forceCancelOrder(isrefund) {
-    let busySpinner:any = await this.uiService.presentBusySpinner();
+    let busySpinner: any = await this.uiService.presentBusySpinner();
     try {
 
-      await this.orderService.cancelOrder(this.order.id,isrefund);
+      await this.orderService.cancelOrder(this.order.id, isrefund);
       this.reopenTheSlots();
       busySpinner.dismiss();
       this.uiService.presentToast("Order Canceled successfully");
@@ -213,7 +213,7 @@ export class AppBookingDetailsPage implements OnInit {
 
     for (let i = 0; i < this.order.allSlots.length; i++) {
       let idToDelete = this.order.allSlots[i].id;
-      console.log("slots deleting are",idToDelete);
+      console.log("slots deleting are", idToDelete);
       await this.afs.collection<any>('booked_slots').doc(idToDelete).delete();
     }
   }
@@ -221,15 +221,13 @@ export class AppBookingDetailsPage implements OnInit {
     this.navCtrl.navigateRoot('bookings', { animated: true });
   }
   navigateToSlotReschdulePage() {
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-          "vendorId": this.order.vendorId,
-          "selectedPackage":this.order.packageId,
-          "addons":this.order.addonIds,
-          "orderId":this.order.id
-      }
-    };
-    this.navCtrl.navigateRoot('reschdule-slot', { animated: true });
+    this.navCtrl.navigateForward(`reschdule-slot?vendorId=${encodeURI(this.order.vendorId)}&selectedPackage=${encodeURI(this.order.packageId)}&addons=${encodeURI(this.order.addonIds.toString())}&orderId=${encodeURI(this.order.id)}`, { animated: true });
+  }
+  navigateToWelcomePage() {
+    this.navCtrl.navigateRoot('welcome', { animated: true });
+  }
+  navigateToErrorPage() {
+    this.navCtrl.navigateForward("error", { animated: true });
   }
 
 }

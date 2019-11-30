@@ -16,13 +16,10 @@ export class AppPersonalDetailConfirmPage implements OnInit {
 
 
     vendorId: string;
-    vendor: DefaecoVendor;
     user: User;
     userProfile: DefaecoUserProfile = new DefaecoUserProfile();
     isLoading:boolean = false;
-    constructor(private router: Router, 
-        private vendorService: VendorDataService, 
-        private route: ActivatedRoute, 
+    constructor(private route: ActivatedRoute, 
         private loginService: LoginService,
         private navCtrl: NavController,
         private authService:AuthenticationService,
@@ -37,7 +34,6 @@ export class AppPersonalDetailConfirmPage implements OnInit {
                     this.vendorId = params["vendorId"];
                     if (this.vendorId) {
                         this.isLoading = true;
-                        this.vendor = await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
                         this.userProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
                         this.isLoading = false;
                     }
@@ -48,6 +44,7 @@ export class AppPersonalDetailConfirmPage implements OnInit {
                 } catch (e) {
                     console.log("Error", e);
                     this.isLoading = false;
+                    this.navigateToErrorPage();
                 }
             })
         } else {
@@ -64,7 +61,7 @@ export class AppPersonalDetailConfirmPage implements OnInit {
             } else {
                 await this.loginService.savePublicProfile(this.user.uid, this.userProfile);
                 busySpinner.dismiss();
-                this.navCtrl.navigateForward(`pack-sel?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
+                this.navCtrl.navigateForward(`pack-sel?vendorId=${encodeURI(this.vendorId)}`, { animated: true });
             }
         }catch(e){
             busySpinner.dismiss();
@@ -73,13 +70,16 @@ export class AppPersonalDetailConfirmPage implements OnInit {
     }
     navigateToVendorsDetailsPage(){
 
-        this.navCtrl.navigateBack(`vendor-detail?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
+        this.navCtrl.navigateBack(`vendor-detail?vendorId=${encodeURI(this.vendorId)}`, { animated: true });
     }
     gobackToListingPage() {
         this.navCtrl.navigateRoot('', { animated: true });
     }
     private navigateToLandingPage(){
         this.navCtrl.navigateRoot("welcome",{animated: true})
+    }
+    navigateToErrorPage() {
+        this.navCtrl.navigateForward("error", { animated: true });
     }
 
 }

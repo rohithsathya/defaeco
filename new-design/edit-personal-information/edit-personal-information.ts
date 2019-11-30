@@ -4,6 +4,7 @@ import * as firebase from 'firebase';
 import { User, AuthenticationService } from '../services/authentication.service';
 import { NavController } from '@ionic/angular';
 import { UiService } from '../services/ui.service';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Component({
     selector: 'app-edit-personal-page',
@@ -14,27 +15,48 @@ export class EditPersonalDetailsPage implements OnInit {
 
     user: User;
     userProfile: DefaecoUserProfile = new DefaecoUserProfile();
+    isLoading:boolean = false;
+    skeletonElements:any[] = Array(4);
     private basePath = '/uploads/dp';
     private uploadTask: firebase.storage.UploadTask;
-    constructor(private loginService: LoginService,private authService: AuthenticationService, private navCtrl: NavController,private uiService:UiService) { }
+    constructor(private loginService: LoginService,
+        private fireStore: AngularFirestore,
+        private authService: AuthenticationService, 
+        private navCtrl: NavController,
+        private uiService:UiService) { }
     ngOnInit(){}
     async ionViewWillEnter() {
-        let busySpinner: any = await this.uiService.presentBusySpinner();
-        this.user = await this.authService.getVerifiedLoginUser();
-        if (this.user) {
-            let userProfile:DefaecoUserProfile = await this.loginService.getPublicProfile(this.user.uid) as DefaecoUserProfile;
-            if (userProfile) {
-                this.userProfile = userProfile;
-            }
 
-        } else {
-            this.navigateToLoginPage();
-        }
-        await busySpinner.dismiss();
+        try{
+            this.isLoading = true;
+            this.user = this.authService.getCurrentUser();
+            if (this.user) {
+              await this.getUsersPublicProfile();
+              this.isLoading = false;
+            } else {
+              this.navigateToWelcomePage();
+              this.isLoading = false;
+            }
+          }catch(e){
+            this.isLoading = false;
+            console.log("Error",e);
+            this.navigateToErrorPage();
+          }
     }
-    private navigateToLoginPage(){
-        this.navCtrl.navigateRoot("login");
-    }
+    async getUsersPublicProfile() {
+        return new Promise(async(resolve,reject)=>{
+          try{
+            let public_profile_ref = await this.fireStore.collection('public_profile').doc(this.user.uid).get().toPromise();
+            let userProfile = await public_profile_ref.data() as DefaecoUserProfile;
+            this.userProfile = userProfile?userProfile:new DefaecoUserProfile();
+            resolve();
+          }catch(e){
+            console.log("Error",e);
+            reject(e);
+          }
+        })
+      }
+    
     updateUserPublicProfile() {
         if (!this.userProfile.phoneNumber) {
             this.uiService.presentToast("Phone number is required, please enter a valid phone number");
@@ -87,6 +109,12 @@ export class EditPersonalDetailsPage implements OnInit {
     }
     navigateToAccountPage() {
         this.navCtrl.navigateRoot("profile");
+    }
+    navigateToWelcomePage() {
+        this.navCtrl.navigateRoot('welcome', { animated: true });
+    }
+    navigateToErrorPage() {
+      this.navCtrl.navigateForward("error", { animated: true });
     }
 
 }

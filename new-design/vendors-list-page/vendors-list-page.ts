@@ -5,6 +5,7 @@ import { AppLocationSelectionPage } from '../location-selection-page/location-se
 import { VendorDataService } from '../services/vendors.data.service';
 import { DefaecoVendor } from '../services/interfaces/DefaecoVendor';
 import { AuthenticationService, User } from '../services/authentication.service';
+import { UiService } from '../services/ui.service';
 
 @Component({
   selector: 'app-vendors-list-page',
@@ -25,7 +26,8 @@ export class AppVendorsListPagePage implements OnInit {
     private modalController: ModalController, 
     private vendorService: VendorDataService,
     private authService:AuthenticationService,
-    private navCtrl: NavController) { }
+    private navCtrl: NavController,
+    private uiService:UiService) { }
   
   ngOnInit(){}
   ionViewWillEnter() {
@@ -52,6 +54,7 @@ export class AppVendorsListPagePage implements OnInit {
         this.isLoading = false;
       }
     } catch (e) {
+      this.navigateToErrorPage();
       console.log("Error>>>vendors-list-page.ts>>>init()");
       this.isLoading = false;
     }
@@ -99,10 +102,6 @@ export class AppVendorsListPagePage implements OnInit {
     //this.sortVendorListBasedOnRanking()
 
   }
-  goToVendorDetails(vendor:DefaecoVendor) {
-    this.vendorService.setCurrentVendor(vendor);
-    this.navCtrl.navigateForward(`vendor-detail?vendorId=${encodeURI(vendor.id)}`);
-  }
   async changeLocationClick() {
     await this.showLocationSelectionModal();
   }
@@ -116,6 +115,13 @@ export class AppVendorsListPagePage implements OnInit {
   }
   navigateToWelcomePage(){
     this.navCtrl.navigateRoot('welcome', { animated: true });
+  }
+  goToVendorDetails(vendor:DefaecoVendor) {
+    this.vendorService.setCurrentVendor(vendor);
+    this.navCtrl.navigateForward(`vendor-detail?vendorId=${encodeURI(vendor.id)}`);
+  }
+  navigateToErrorPage(){
+    this.navCtrl.navigateForward("error",{ animated: true });
   }
 
 

@@ -16,39 +16,39 @@ export class AppVendorDetailsPage implements OnInit {
     slideOpts = {
         initialSlide: 0,
         speed: 300
-      };
-    vendor:DefaecoVendor = new DefaecoVendor();
-    vendorId:string;
-    user:User;
-    isLoading:boolean = false;
-      
-    constructor(private router: Router,
-        private vendorService:VendorDataService,
+    };
+    vendor: DefaecoVendor = new DefaecoVendor();
+    vendorId: string;
+    user: User;
+    isLoading: boolean = false;
+
+    constructor(private vendorService: VendorDataService,
         private route: ActivatedRoute,
-        private authService:AuthenticationService,
+        private authService: AuthenticationService,
         private navCtrl: NavController) { }
-    ngOnInit(){}
-    ionViewWillEnter(){
+    ngOnInit() { }
+    ionViewWillEnter() {
         this.user = this.authService.getCurrentUser();
         if (this.user) {
             this.route.queryParams.subscribe(async (params) => {
-                try{
+                try {
                     this.isLoading = true;
                     await this.handleVendorId(params);
                     this.isLoading = false;
-                }catch(e){
-                    console.log("Error",e);
+                } catch (e) {
+                    console.log("Error", e);
                     this.isLoading = false;
+                    this.navigateToErrorPage();
                 }
-            }); 
-        }else{
+            });
+        } else {
             this.navigateToWelcomePage();
         }
     }
     async handleVendorId(params) {
-        return new Promise(async(resolve,reject)=>{
-            try{
-                if(params){
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (params) {
                     this.vendorId = params["vendorId"];
                     if (this.vendorId) {
                         this.vendor = await this.vendorService.getVendorById(this.vendorId) as DefaecoVendor;
@@ -59,42 +59,37 @@ export class AppVendorDetailsPage implements OnInit {
                         this.navigateToVendorsPage();
                     }
                 }
-    
-            }catch(e){
-                console.log("Error",e);
+
+            } catch (e) {
+                console.log("Error", e);
                 reject(e);
             }
         })
- 
+
     }
-    parseDefaecTimeToTime(time){
+    parseDefaecTimeToTime(time) {
         let timeStr = '';
-        if(time == 12.5){
+        if (time == 12.5) {
             timeStr = (time) + " PM";
         }
-        else if(time > 12.5){
-            timeStr = (time-12) + " PM";
-        }else{
+        else if (time > 12.5) {
+            timeStr = (time - 12) + " PM";
+        } else {
             timeStr = (time) + " AM";
         }
         return timeStr;
     }
-    navigateToVendorsPage(){
+    navigateToVendorsPage() {
         this.navCtrl.navigateRoot('', { animated: true });
     }
-    navigateToWelcomePage(){
+    navigateToWelcomePage() {
         this.navCtrl.navigateRoot('welcome', { animated: true });
-      }
-    
-    bookServiceClick(){
-        // let navigationExtras: NavigationExtras = {
-        //     queryParams: {
-        //         "vendorId": this.vendor.id
-        //     }
-        //   };
+    }
+    bookServiceClick() {
         this.navCtrl.navigateForward(`confirm-personal-details?vendorId=${encodeURI(this.vendor.id)}`, { animated: true });
-        
-        //this.router.navigate(['/', 'confirm-personal-details'],navigationExtras); //main
+    }
+    navigateToErrorPage() {
+        this.navCtrl.navigateForward("error", { animated: true });
     }
 
 }

@@ -9,7 +9,7 @@
     
     <ion-content>
   
-      <div style="background-color: whitesmoke;height:100%;width:100%;overflow: auto">
+      <div *ngIf="!isLoading" style="background-color: whitesmoke;height:100%;width:100%;overflow: auto">
         <div style="margin:16px">
           <ion-item lines="none">
             <ion-avatar slot="start">
@@ -99,6 +99,41 @@
               <div style="margin:36px 16px 16px 16px">
                   <ion-button style="background-color: white;width: 60%;margin:auto" expand="block" fill="outline" color="danger" (click)="signOutClick()">Sign out</ion-button>
               </div>
+      </div>
+      <div *ngIf="isLoading" style="background-color: whitesmoke;height:100%;width:100%;overflow: auto">
+          <div style="margin:16px">
+              <ion-item lines="none">
+                <ion-avatar slot="start">
+                 <div style="height: 40px;width:40px;background: grey;"></div>
+                </ion-avatar>
+            
+                <ion-label style="margin: 24px 0px">
+                  <h2><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h2>
+                  <p><ion-skeleton-text animated style="width: 80%"></ion-skeleton-text></p>
+            
+                </ion-label>
+            
+                <ion-thumbnail slot="end" class="ion-activatable">
+                  <ion-icon style="font-size:30px;margin-top: 12px" name="create" color="primary"></ion-icon>
+                  <ion-ripple-effect></ion-ripple-effect>
+                </ion-thumbnail>
+              </ion-item>
+            </div>
+          <div style="margin:8px 16px" *ngFor="let sk of skeletonElements">
+              <ion-item lines="none">
+                <ion-thumbnail slot="start">
+                  <ion-icon style="font-size:20px;margin-top: 12px;color:#747474" name="albums"></ion-icon>
+                </ion-thumbnail>
+                <ion-label>
+                  <p>
+                    <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                  </p>
+                  <h3>
+                      <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  </h3>
+                </ion-label>
+              </ion-item>
+            </div>
       </div>
   
     </ion-content>

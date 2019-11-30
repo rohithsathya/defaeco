@@ -22,3 +22,12 @@
 ::ng-deep.swiper-pagination-bullet{
     opacity: 0.9;
 }
+
+.step-counter{
+    width:60px;
+    height:60px;
+    border-radius: 50%;
+    background-color:var(--ion-color-defaeco-primary);
+    color:white;
+    margin:auto;
+}

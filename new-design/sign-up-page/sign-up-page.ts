@@ -68,7 +68,7 @@ export class SignUpPage implements OnInit {
         return true;
     }
     private navigateLogInPage() {
-        this.navCtrl.navigateRoot("login",{animated: true})
+        this.navCtrl.navigateBack("login",{animated: true})
     }
     private navigateToMainPage(){
         this.navCtrl.navigateRoot("",{animated: true});

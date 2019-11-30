@@ -109,18 +109,18 @@
                     </h5>
                     <p>
                         <ion-chip>
-                            <ion-label style="width: 40%;">
-                                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+                            <ion-label style="width: 40px;">
+                                <ion-skeleton-text animated></ion-skeleton-text>
                             </ion-label>
                         </ion-chip>
                         <ion-chip>
-                            <ion-label style="width: 40%;">
-                                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+                            <ion-label style="width: 40px;">
+                                <ion-skeleton-text animated></ion-skeleton-text>
                             </ion-label>
                         </ion-chip>
                         <ion-chip>
-                            <ion-label style="width: 40%;">
-                                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+                            <ion-label style="width: 40px;">
+                                <ion-skeleton-text animated></ion-skeleton-text>
                             </ion-label>
                         </ion-chip>
                     </p>
@@ -148,7 +148,7 @@
 
                 </ion-col>
                 <ion-col (click)="proceedClick()" size="6">
-                    <ion-button color="primary" expand="block" fill="outline">Proceed</ion-button>
+                    <ion-button [disabled]="!(this.selectedSlot && this.selectedSlot.isSelected)" color="defaeco-primary" expand="block" fill="outline">Proceed</ion-button>
                 </ion-col>
             </ion-row>
         </ion-grid>

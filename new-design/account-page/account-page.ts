@@ -3,6 +3,7 @@ import { DataService } from '../services/data.service';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AuthenticationService, User } from '../services/authentication.service';
 import { NavController } from '@ionic/angular';
+import { UiService } from '../services/ui.service';
 
 @Component({
   selector: 'app-account-page',
@@ -13,41 +14,72 @@ export class AppAccountPage {
 
   user: User = {};
   userProfile: any = {};
-  constructor(private dataService: DataService, private fireStore: AngularFirestore, private authService: AuthenticationService, private navCtrl: NavController) { }
+  isLoading: boolean = false;
+  skeletonElements: any[] = Array(4);
+  constructor(private dataService: DataService,
+    private fireStore: AngularFirestore,
+    private authService: AuthenticationService,
+    private navCtrl: NavController,
+    private uiService: UiService) { }
+
   async ionViewWillEnter() {
-    let busySpinner: any = await this.dataService.presentBusySpinner();
-    this.user = await this.authService.getVerifiedLoginUser();
-    if (this.user) {
-      this.getUsersPublicProfile();
-    } else {
-      this.navigateToLoginPage();
+    try {
+      this.isLoading = true;
+      this.user = this.authService.getCurrentUser();
+      if (this.user) {
+        await this.getUsersPublicProfile();
+        this.isLoading = false;
+      } else {
+        this.navigateToWelcomePage();
+        this.isLoading = false;
+      }
+    } catch (e) {
+      this.isLoading = false;
+      console.log("Error", e);
+      this.navigateToErrorPage();
     }
-    await busySpinner.dismiss();
+
   }
+
   async signOutClick() {
-    await this.authService.logoutUser();
-    this.dataService.resetLocation();
-    this.dataService.saveLoggedInUser(null);
-    this.navigateToLoginPage();
+    let busySpinner: any = await this.uiService.presentBusySpinner();
+    try {
+      await this.authService.logoutUser();
+      this.dataService.resetLocation();
+      this.dataService.saveLoggedInUser(null);
+      busySpinner.dismiss();
+      this.navigateToWelcomePage();
+    } catch (e) {
+      busySpinner.dismiss();
+      console.log("Error", e);
+    }
+
 
   }
   navigateToLoginPage() {
     this.navCtrl.navigateRoot('login', { animated: true });
   }
   navigateToEditProfile() {
-    this.navCtrl.navigateRoot('edit-profile', { animated: true });
+    this.navCtrl.navigateForward('edit-profile', { animated: true });
   }
   async getUsersPublicProfile() {
-    let busySpinner: any = await this.dataService.presentBusySpinner();
-    let public_profile_ref = await this.fireStore.collection('public_profile').doc(this.user.uid).get().toPromise();
-    let userProfile = await public_profile_ref.data() //.toPromise();
-
-    if (userProfile) {
-      this.userProfile = userProfile;
-    }
-    await busySpinner.dismiss();
-
-
+    return new Promise(async (resolve, reject) => {
+      try {
+        let public_profile_ref = await this.fireStore.collection('public_profile').doc(this.user.uid).get().toPromise();
+        let userProfile = await public_profile_ref.data();
+        this.userProfile = userProfile ? userProfile : {};
+        resolve();
+      } catch (e) {
+        console.log("Error", e);
+        reject(e);
+      }
+    })
+  }
+  navigateToWelcomePage() {
+    this.navCtrl.navigateRoot('welcome', { animated: true });
+  }
+  navigateToErrorPage() {
+    this.navCtrl.navigateForward("error", { animated: true });
   }
 
 }
