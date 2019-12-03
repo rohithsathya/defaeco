@@ -84,6 +84,29 @@
                 No Slots available for selected date.
             </p>
         </div>
+        
+
+        <ion-grid>
+                <ion-row>
+                    <ion-col>
+                        <div style="text-align: center;">
+                                {{getMonthNameFromDate(selectedDate)}} <br/>
+                                {{selectedDate.getFullYear()}}
+                        </div>
+                    </ion-col>
+                   
+                </ion-row>
+            <ion-row>
+                <ion-col *ngFor="let day of nextSevenDaysDate" (click)="userPickedDateEvent(day)">
+                        <div [ngStyle]="{'background': day==selectedDate?'#222428':'lightgray','color': day==selectedDate?'white':'black'}" style="height: 100%;width: 100%;background: lightgray;text-align: center;">
+                            {{getDayNameFromDate(day)}} <br/>
+                            {{day.getDate()}}
+                        </div>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+
+
     </div>
     <div *ngIf="isLoading">
     

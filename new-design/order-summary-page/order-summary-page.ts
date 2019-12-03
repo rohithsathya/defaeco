@@ -10,6 +10,8 @@ import { DefaecoOrder, OrderService } from '../services/order.service';
 import { UiService } from '../services/ui.service';
 import { AuthenticationService, User } from '../services/authentication.service';
 import { NavController } from '@ionic/angular';
+import { CloudFunctionHelper } from '../services/cloudFunctionHelper';
+import { HttpHeaders, HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-order-summary-page',
@@ -39,7 +41,8 @@ export class AppOrderSummaryPage implements OnInit {
         private orderService: OrderService,
         private authService: AuthenticationService,
         private uiService: UiService,
-        private navCtrl: NavController) { }
+        private navCtrl: NavController,
+        private http: HttpClient) { }
     ngOnInit() { }
     async ionViewWillEnter() {
 
@@ -138,11 +141,64 @@ export class AppOrderSummaryPage implements OnInit {
 
                 this.slotsCollectionToSave.push(slotTosave);
             }
+            //cloud function code
+            const dateInmilli = this.selectedDate.getTime();
+            let placedOrder:DefaecoOrder = await this.orderService.placeOrderApi(dateInmilli,this.vendor.id,this.package.code,this.addonIds,this.slotsCollectionToSave[0].slotname,this.slotsCollectionToSave[0].bayname)
+            
+            
+    //         console.log("slots to save and order obj");
+    //         console.log(this.slotsCollectionToSave);
+    //         let orderObj: DefaecoOrder = this.getOrderObject();
+    //         console.log(orderObj);
+
+
+    //         let req = {
+    //             "body": {
+    //                 "slotsToSave": Object.assign([], this.slotsCollectionToSave),
+    //                 "orderObj": Object.assign({}, orderObj),
+    //                 "date":this.selectedDate.getTime(),
+    //                 "vendorId":this.vendor.id,
+    //                 "packageId":this.package.code,
+    //                 "addonIds":this.addonIds ? this.addonIds : [],
+    //                 "startingSlot":this.slotsCollectionToSave[0].slotname,
+    //                 "bayName":this.slotsCollectionToSave[0].bayname
+
+    //             }
+    //         };
+
+    //         let token: any = await this.getUserToken();
+    //   const httpOptions = {
+    //     headers: new HttpHeaders({
+    //       'Content-Type': 'application/json',
+    //       'Authorization': token
+    //     })
+    //   };
+    //   let data = req.body;
+      //let placedOrder:DefaecoOrder = await this.http.post<DefaecoOrder>('https://us-central1-defaeco3.cloudfunctions.net/webApi/createOrder', data, httpOptions).toPromise();
+
+
+
+
+
+
+
+      /*
+
+            debugger;
+           let cfHelper:CloudFunctionHelper = new CloudFunctionHelper();
+           let placedOrderObj:DefaecoOrder = await cfHelper.placeOrder(req,this.user) as DefaecoOrder;
+           await busySpinner.dismiss();
+           this.orderPlacedSuccessfully(placedOrderObj.id);
+
+            debugger;
+            return;
+
             await this.saveSlots();
-            let orderObj: DefaecoOrder = this.getOrderObject();
+            //let orderObj: DefaecoOrder = this.getOrderObject();
             orderID = await this.orderService.placeOrder(orderObj);
+            */
             await busySpinner.dismiss();
-            this.orderPlacedSuccessfully(orderID);
+            this.orderPlacedSuccessfully(placedOrder.id);
 
         } catch (e) {
             console.log("ERROR!!!", e);

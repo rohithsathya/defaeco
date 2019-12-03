@@ -82,25 +82,27 @@ export class AppLogInPage implements OnInit {
 
     //Facebook
     loginWithFacebook() {
+        this.uiService.presentToast("oh Uff!!!, you guys will never listen to me i told you not to press this :)");
+        return;
 
-        //this.dataService.showLoadingPopup();
+        // //this.dataService.showLoadingPopup();
 
-        this.fb.login(['email'])
-            .then((res: FacebookLoginResponse) => {
-                //this.dataService.hideLoadingPopup();
-                console.log('Logged into Facebook!', res);
-                this.onFBLoginSuccess(res);
+        // this.fb.login(['email'])
+        //     .then((res: FacebookLoginResponse) => {
+        //         //this.dataService.hideLoadingPopup();
+        //         console.log('Logged into Facebook!', res);
+        //         this.onFBLoginSuccess(res);
 
-            })
-            .catch(e => {
-                //this.dataService.hideLoadingPopup();
-                console.log('Error logging into Facebook', e);
-                alert("Error logining in : " + JSON.stringify(e));
+        //     })
+        //     .catch(e => {
+        //         //this.dataService.hideLoadingPopup();
+        //         console.log('Error logging into Facebook', e);
+        //         alert("Error logining in : " + JSON.stringify(e));
 
-            });
+        //     });
 
 
-        this.fb.logEvent(this.fb.EVENTS.EVENT_NAME_ADDED_TO_CART);
+        // this.fb.logEvent(this.fb.EVENTS.EVENT_NAME_ADDED_TO_CART);
     }
     async onFBLoginSuccess(res: FacebookLoginResponse) {
         //this.dataService.showLoadingPopup();
@@ -112,23 +114,25 @@ export class AppLogInPage implements OnInit {
     }
     //google
     async loginWithGooglePlus() {
+        this.uiService.presentToast("oh Uff!!!, you guys will never listen to me i told you not to press this :)");
+        return;
 
-        try {
+        // try {
 
-            const gplusUser = await this.gplus.login({
-                'webClientId': '564809703285-srn2jodqk4iliccdg28ed9nv193je1p9.apps.googleusercontent.com',
-                'offline': true,
-                'scopes': 'profile email'
-            })
-            //this.dataService.showLoadingPopup();
-            await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-            await this.fireAuth.auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gplusUser.idToken));
-            //this.dataService.hideLoadingPopup();
-            this.handleUserLogIn();
+        //     const gplusUser = await this.gplus.login({
+        //         'webClientId': '564809703285-srn2jodqk4iliccdg28ed9nv193je1p9.apps.googleusercontent.com',
+        //         'offline': true,
+        //         'scopes': 'profile email'
+        //     })
+        //     //this.dataService.showLoadingPopup();
+        //     await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        //     await this.fireAuth.auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(gplusUser.idToken));
+        //     //this.dataService.hideLoadingPopup();
+        //     this.handleUserLogIn();
 
-        } catch (e) {
-            alert("Error logining in : " + JSON.stringify(e));
-        }
+        // } catch (e) {
+        //     alert("Error logining in : " + JSON.stringify(e));
+        // }
 
 
 

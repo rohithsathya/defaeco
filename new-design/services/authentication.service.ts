@@ -186,6 +186,18 @@ export class AuthenticationService {
         })
        
     }
+    getUserToken(){
+        return new Promise((resolve,reject)=>{
+          firebase.auth().onAuthStateChanged(async (user: any) => {
+            try{
+              let token = await firebase.auth().currentUser.getIdToken();
+              resolve(token);
+            }catch(e){
+              reject(e);
+            }
+          })
+        })
+      }
 
     
 

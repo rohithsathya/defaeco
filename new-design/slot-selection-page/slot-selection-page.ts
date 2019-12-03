@@ -74,8 +74,10 @@ export class AppSlotSelectionPage implements OnInit {
                             this.grandTotal = this.grandTotal + currentAddOn.price;
                             this.totalSlotsRequired = this.totalSlotsRequired + currentAddOn.noOfSlotsNeeded;
                         }
-                    }             
+                    }   
                     await this.showAvailableSlots(this.userPickedTime,this.totalSlotsRequired);
+                    this.prepareUi();
+                    this.getslotsMatrixForGivenDate(this.userPickedTime,this.totalSlotsRequired,this.isPremium);
                     this.isLoading=false;
                 }
                 else{
@@ -101,6 +103,62 @@ export class AppSlotSelectionPage implements OnInit {
         }
     }
 
+    allSlotsForNextSevenDays:any = {};
+    slotsMatrix:any={};
+    nextSevenDaysDate:Date[] = [];
+    selectedDate:Date = new Date;
+    prepareUi(){
+        for(let i=0;i<7;i++){
+            let date = new Date();
+            let otherDate = new Date();
+            otherDate.setDate(date.getDate() + i);
+            this.nextSevenDaysDate.push(otherDate);
+        }
+        this.selectedDate = this.nextSevenDaysDate[0];
+    }
+    getDayNameFromDate(date:Date){
+        let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        return days[date.getDay()];
+    }
+    getMonthNameFromDate(date:Date){
+        let days = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul','Aug','Sep','Oct','Nov','Dec'];
+        return days[date.getMonth()];
+    }
+    userPickedDateEvent(date:Date){
+        this.selectedDate = date;
+        this.getslotsMatrixForGivenDate(this.selectedDate,this.totalSlotsRequired,this.isPremium);
+    }
+    async getslotsMatrixForGivenDate(selectedDateInput:Date,slotsRequired:number,isPremium:boolean){
+        let selDate:Date = new Date(selectedDateInput);
+        this.allSlotsForNextSevenDays = await this.slotService.getAvailableSlots_new(this.vendor);
+        const noOfSlots = (this.vendor.shopCloseTime - this.vendor.shopOpenTime) / this.vendor.slotDuration;
+        this.slotsMatrix = {};
+        //check if the slots avaialble individualy
+        let bays = this.isPremium?this.vendor.premiumBays: this.vendor.basicBays.concat(this.vendor.premiumBays);
+                
+        for(let i=0;i<noOfSlots;i++){
+            this.slotsMatrix[i] = {"bay":"NA","available":false}
+            //now for each bays
+            let currentBay:any;
+            let isAvailable:boolean = false;
+            for(let j=0;j<bays.length;j++){
+                currentBay = bays[j];
+                isAvailable =  this.slotService.isSlotAvailableInTheBay(this.vendor,this.allSlotsForNextSevenDays,i,slotsRequired,selDate,isPremium,currentBay);
+                if(isAvailable){
+                    break;
+                }
+            }
+            if(isAvailable){
+                //slot is available
+                this.slotsMatrix[i] = {"bay":currentBay,"available":isAvailable}
+            }
+        }
+        console.log("slot Matrix for >>>>>",selectedDateInput.toString());
+        console.log(this.slotsMatrix);
+
+    }
+
+
     showAvailableSlots(selectedDateInput,slotsRequired:number,isPremium?:boolean){
         return new Promise(async (resolve,reject)=>{
 
@@ -122,6 +180,39 @@ export class AppSlotSelectionPage implements OnInit {
                     isToday = true;
                     timeToday = todayDate_defaecoFormat.time;
                 }
+                /*
+                //this.slotService.getAvailableSlotsForGivenDate(this.vendor, slotsRequired,selDate.getTime());   
+                //this.slotService.getAvailableSlotsForGivenDateForPremium(this.vendor, slotsRequired,selDate.getTime());          
+                this.allSlotsForNextSevenDays = await this.slotService.getAvailableSlots_new(this.vendor);
+                debugger;
+                const noOfSlots = (this.vendor.shopCloseTime - this.vendor.shopOpenTime) / this.vendor.slotDuration;
+                let slotsMatrix:any = {};
+                //check if the slots avaialble individualy
+                let bays = this.isPremium?this.vendor.premiumBays: this.vendor.basicBays.concat(this.vendor.premiumBays);
+                
+                for(let i=0;i<noOfSlots;i++){
+                    slotsMatrix[i] = {"bay":"NA","available":false}
+                    //now for each bays
+                    let currentBay:any;
+                    let isAvailable:boolean = false;
+                    for(let j=0;j<bays.length;j++){
+                        currentBay = bays[j];
+                        isAvailable =  this.slotService.isSlotAvailableInTheBay(this.vendor,this.allSlotsForNextSevenDays,i,4,todayMilliSeconds,this.isPremium,currentBay);
+                        if(isAvailable){
+                            break;
+                        }
+                    }
+                    if(isAvailable){
+                        //slot is available
+                        slotsMatrix[i] = {"bay":currentBay,"available":isAvailable}
+
+                    }
+
+
+                }
+                debugger;
+
+                */
 
                 this.availableSlots = await this.slotService.getAvailableSlots(this.vendor, slotsRequired, this.isPremium, selDate_defaecoFormat.date, timeToday, isToday, selNextDate_defaecoFormat.date,false) as DefaecoSlot[];
                 if(this.availableSlots.length <= 0){
@@ -199,6 +290,7 @@ export class AppSlotSelectionPage implements OnInit {
         this.userPickedTime = new Date(event.target.value);
         let busySpinner:any = await this.uiService.presentBusySpinner();                
         await this.showAvailableSlots(this.userPickedTime,this.totalSlotsRequired);
+        this.getslotsMatrixForGivenDate(this.userPickedTime,this.totalSlotsRequired,this.isPremium);
         await busySpinner.dismiss();
     }
     navigateToAddonPage(){

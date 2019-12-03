@@ -323,6 +323,154 @@ export class SlotService {
         return slotObj;
     }
 
+    //date in milli
+    getAvailableSlots_new(vendor: DefaecoVendor) {
+        return new Promise(async(resolve, reject) => {
+            const noOfSlots = (vendor.shopCloseTime - vendor.shopOpenTime) / vendor.slotDuration;
+            let todayAsDate: Date = new Date();
+            //let dateGiven: string = this.dataService.formatDate(date).date;
+            let allSlots: any = {};
+            let allBays = vendor.basicBays.concat(vendor.premiumBays);
+            //for next seven days
+            let nextSevenDaysDate: Date[] = [];
+            let nextSevenDaysString: string[] = [];
+            for (let i = 0; i < 7; i++) {
+                let currentDate: Date = (new Date(todayAsDate));
+                currentDate.setDate(todayAsDate.getDate() + i);
+                const currentDateAsString: string = this.dataService.formatDate(currentDate.getTime()).date;
+                nextSevenDaysDate.push(currentDate);
+                nextSevenDaysString.push(currentDateAsString);
+            }
+
+            for (let k = 0; k < nextSevenDaysDate.length; k++) {
+                for (let i = 0; i < allBays.length; i++) {
+                    for (let j = 0; j < noOfSlots; j++) {
+                        const currentSlotId = `${nextSevenDaysString[k]}_${vendor.id}_${allBays[i]}_${j}`;
+                        const currentSlot = { isBooked: false, date: nextSevenDaysDate[k], slot: j, bay: i, };
+                        allSlots[currentSlotId] = currentSlot;
+                    }
+                }
+            }
+            console.log("all slots for given day", allSlots);
+            let inQuery: any = 'in';
+            const slotsBookedCollection = this.afs.collection<any>('booked_slots', ref => ref.where('date', inQuery, nextSevenDaysString).where('vendorId', '==', vendor.id));
+            const slotsList = await slotsBookedCollection.get().toPromise();
+            const bookedSlotsForNextSevenDays: any[] = [];
+            slotsList.forEach((doc) => {
+                let slot: any = doc.data() as any;
+                bookedSlotsForNextSevenDays.push(slot);
+                if (allSlots[slot.id]) {
+                    allSlots[slot.id].isBooked = true;
+                }
+            });
+
+            resolve(allSlots);
+        })
+
+    }
+    isSlotAvailableInTheBay(vendor: DefaecoVendor,allSlots:any,startSlot:number,sloteRequired: number,date: Date,isPremium:boolean,bayId:string){
+        //debugger;
+        let requiredSlotIds:any[] = [];
+        let givenDateString: string = this.dataService.formatDate(date).date;
+        let nextdayDate:Date = new Date(date);
+        let nextdayString:string = this.dataService.formatDate(nextdayDate.setDate(nextdayDate.getDate() + 1)).date;
+        const noOfSlots = (vendor.shopCloseTime - vendor.shopOpenTime) / vendor.slotDuration;
+        //let allBays = vendor.basicBays.concat(vendor.premiumBays);
+        let endSlot = startSlot + sloteRequired;
+        let currentBay = bayId;
+
+        //if endslot is greater than noofSlots perDay for non premium service then directly return false;
+        if(!isPremium && endSlot>=noOfSlots){
+            return false;
+        }
+
+        //book past slots for today
+        const pastTimeBookedSlots = this.getPastTimeSlots(vendor,date);
+        for(let i=0;i<pastTimeBookedSlots.length;i++){
+            if( allSlots[pastTimeBookedSlots[i].id]){
+                allSlots[pastTimeBookedSlots[i].id].isBooked = true;
+            }
+        }
+
+
+        for(let i=startSlot;i<endSlot;i++){
+            let currentSlot = i;
+            let dateStr = givenDateString;
+            if(i>=noOfSlots && isPremium){
+                currentSlot = i-noOfSlots;
+                dateStr = nextdayString;
+            }
+           let currentSlotId = `${dateStr}_${vendor.id}_${currentBay}_${currentSlot}`;
+           requiredSlotIds.push(currentSlotId); //all these should be available
+        }
+
+        let isbooked = false;
+        for(let i=0;i<requiredSlotIds.length;i++){
+            if(allSlots[requiredSlotIds[i]] && allSlots[requiredSlotIds[i]].isBooked){
+                isbooked = true;
+                break;
+            }
+        }
+
+        return !isbooked; //not of isBooked
+
+    }
+    private getPastTimeSlots(vendor,givenDate:Date){
+
+        let todaydate:Date = new Date();
+        let timePastSlotsBooked: any = [];
+        let totalNumberOfSlotsToBeBooked = 0;
+        //check if today is same as given date
+        if(todaydate.getDate() == givenDate.getDate() && todaydate.getMonth() == givenDate.getMonth()&& todaydate.getFullYear() == givenDate.getFullYear() ){
+            //today time in given format
+            let todayTimeInDefaecoFormat = todaydate.getHours() + (todaydate.getMinutes() / 60);
+            let todayDateInDefaecoFormat = this.dataService.formatDate(givenDate.getTime()).date;;
+            if (todayTimeInDefaecoFormat > vendor.shopCloseTime) {
+                todayTimeInDefaecoFormat = vendor.shopCloseTime;
+            }
+            if (todayTimeInDefaecoFormat > vendor.shopOpenTime) {
+                totalNumberOfSlotsToBeBooked = Math.floor(todayTimeInDefaecoFormat - vendor.shopOpenTime) / vendor.slotDuration;
+            }
+            for(let i=0;i<totalNumberOfSlotsToBeBooked;i++){
+
+                let bookedSlotsForSlotI = this.blockAndReturnBlockObjForGivenSlot_new(vendor,i,todayDateInDefaecoFormat);
+                timePastSlotsBooked = timePastSlotsBooked.concat(bookedSlotsForSlotI)
+            }
+
+
+        }
+        return timePastSlotsBooked;
+    }
+    private blockAndReturnBlockObjForGivenSlot_new(vendor,slotNumber,date:string){
+        
+        let timePastSlotsBooked: any = [];
+        //block basic slot
+        for (let i = 0; i < vendor.basicBays.length; i++) {
+            let bookObj = {
+                "date": date,
+                "slot": `${slotNumber}`,
+                "bay": vendor.basicBays[i], 
+                "type": "basic",
+                "id":`${date}_${vendor.id}_${vendor.basicBays[i]}_${slotNumber}`
+            }
+            timePastSlotsBooked.push(bookObj);
+        }
+        //block premium slot
+        for (let i = 0; i < vendor.premiumBays.length; i++) {
+            let bookObj = {
+                "date": date,
+                "slot": `${slotNumber}`,
+                "bay": vendor.premiumBays[i], 
+                "type": "premium",
+                "id":`${date}_${vendor.id}_${vendor.premiumBays[i]}_${slotNumber}`
+            }
+            timePastSlotsBooked.push(bookObj);
+        }
+        return timePastSlotsBooked;
+
+    }
+
+
     /*
      allSlots: any[] = [];
     baySlotsMatrix: any = {};

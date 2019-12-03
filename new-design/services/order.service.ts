@@ -1,12 +1,13 @@
 import { Injectable } from "@angular/core";
 import { DataService } from "./data.service";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { AngularFirestore } from "@angular/fire/firestore";
 import { DefaecoVendor } from "./interfaces/DefaecoVendor";
 import { VendorDataService } from "./vendors.data.service";
 import { reject, async } from 'q';
 import { LoginService } from "./login.service";
 import * as firebase from 'firebase';
+import { AuthenticationService } from "./authentication.service";
 
 @Injectable({
     providedIn: 'root',
@@ -15,7 +16,10 @@ export class OrderService {
 
     private orderEntityName = 'orders';
 
-    constructor(private afs: AngularFirestore,private loginService:LoginService) { }
+    constructor(private afs: AngularFirestore,
+        private loginService:LoginService,
+        private authService:AuthenticationService,
+        private http: HttpClient) { }
 
     getAllMyOrders(user) {
         return new Promise(async (resolve, reject) => {
@@ -148,6 +152,35 @@ export class OrderService {
 
         })
         
+
+    }
+    placeOrderApi(date: number, vendorId: string, packageId: number, addonIds: string[], startingSlot: number, bayName: string):Promise<DefaecoOrder> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                debugger;
+                let reqBody = {
+                    "date": date,
+                    "vendorId": vendorId,
+                    "packageId": packageId,
+                    "addonIds": addonIds ? addonIds : [],
+                    "startingSlot": startingSlot,
+                    "bayName": bayName
+                };
+
+                let token: any = await this.authService.getUserToken();
+                const httpOptions = {
+                    headers: new HttpHeaders({
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    })
+                };
+                let placedOrder: DefaecoOrder = await this.http.post<DefaecoOrder>('https://us-central1-defaeco3.cloudfunctions.net/webApi/createOrder', reqBody, httpOptions).toPromise();
+                resolve(placedOrder);
+
+            } catch (e) {
+                reject(e);
+            }
+        });
 
     }
 }
